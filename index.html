@@ -17,35 +17,153 @@
     
     <style>
         .stat-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .stat-card:hover::before {
+            left: 100%;
         }
         .stat-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         .capacity-circle {
-            transition: stroke-dashoffset 0.5s ease;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s;
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 1;
+            }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .table-row-enter {
+            animation: slideInLeft 0.3s ease-out;
+        }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .trend-up { color: #22c55e; }
+        .trend-down { color: #ef4444; }
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+        }
+        .quick-action-btn {
+            transition: all 0.2s;
+        }
+        .quick-action-btn:active {
+            transform: scale(0.95);
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .auto-refresh-indicator {
+            animation: rotate 2s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .badge-animated {
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <div class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-green-700 to-green-600 text-white shadow-lg">
-            <div class="container mx-auto px-4 py-6">
+        <!-- Enhanced Header -->
+        <header class="bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white shadow-xl">
+            <div class="container mx-auto px-4 py-4">
                 <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div class="flex items-center space-x-3">
-                        <span class="material-icons text-4xl">local_parking</span>
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white bg-opacity-20 p-3 rounded-xl backdrop-blur-sm">
+                            <span class="material-icons text-4xl">local_parking</span>
+                        </div>
                         <div>
-                            <h1 class="text-2xl font-bold">Sistem Parkir FST UMKT</h1>
-                            <p class="text-sm text-green-100">Dashboard Monitoring Real-time</p>
+                            <h1 class="text-2xl font-bold tracking-tight">Sistem Parkir FST UMKT</h1>
+                            <div class="flex items-center space-x-3 mt-1">
+                                <p class="text-sm text-green-100">Dashboard Monitoring Real-time</p>
+                                <span class="inline-flex items-center space-x-1 bg-green-800 bg-opacity-50 px-2 py-1 rounded-full text-xs">
+                                    <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+                                    <span>LIVE</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <p class="text-sm font-semibold" id="currentTime"></p>
-                            <p class="text-xs text-green-100" id="sessionInfo">Live Monitoring</p>
+                        <!-- Live Clock -->
+                        <div class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                            <div class="text-right">
+                                <p class="text-xs text-green-100">Waktu Saat Ini</p>
+                                <p class="text-lg font-bold font-mono" id="currentTime"></p>
+                                <p class="text-xs text-green-100" id="currentDate"></p>
+                            </div>
                         </div>
-                        <button onclick="openSettings()" class="p-2 hover:bg-green-600 rounded-lg transition">
+                        <!-- Session Info -->
+                        <div class="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                            <div class="text-right">
+                                <p class="text-xs text-green-100">Session</p>
+                                <p class="text-sm font-semibold" id="sessionInfo">System</p>
+                            </div>
+                        </div>
+                        <!-- Settings Button -->
+                        <button onclick="openSettings()" class="p-3 hover:bg-white hover:bg-opacity-20 rounded-lg transition backdrop-blur-sm" title="Pengaturan (Alt+S)">
                             <span class="material-icons">settings</span>
                         </button>
                     </div>
@@ -54,101 +172,130 @@
         </header>
 
         <div class="container mx-auto px-4 py-6">
-            <!-- Capacity Indicator Banner -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6 animate-fade-in">
+            <!-- Enhanced Capacity Indicator with Quick Actions -->
+            <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 mb-6 border border-gray-200 animate-fade-in">
                 <div class="flex items-center justify-between flex-wrap gap-6">
+                    <!-- Capacity Meter -->
                     <div class="flex items-center space-x-6">
                         <div class="relative">
-                            <svg class="transform -rotate-90" width="120" height="120">
-                                <circle cx="60" cy="60" r="52" stroke="#e5e7eb" stroke-width="12" fill="none"/>
-                                <circle id="capacityCircle" cx="60" cy="60" r="52" stroke="#15803d" stroke-width="12" fill="none" 
+                            <svg class="transform -rotate-90 pulse-ring" width="140" height="140">
+                                <circle cx="70" cy="70" r="62" stroke="#e5e7eb" stroke-width="14" fill="none"/>
+                                <circle id="capacityCircle" cx="70" cy="70" r="62" stroke="#15803d" stroke-width="14" fill="none" 
                                     stroke-linecap="round" class="capacity-circle"
-                                    stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+                                    stroke-dasharray="389.56" stroke-dashoffset="389.56"/>
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div class="text-center">
-                                    <p class="text-3xl font-bold text-gray-800" id="capacityPercent">0%</p>
-                                    <p class="text-xs text-gray-500">Terisi</p>
+                                    <p class="text-4xl font-black text-gray-800" id="capacityPercent">0%</p>
+                                    <p class="text-xs text-gray-500 font-medium">Terisi</p>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">
-                                <span id="currentCapacity">0</span> / <span id="maxCapacity">100</span>
+                            <h2 class="text-3xl font-black text-gray-800 mb-1">
+                                <span id="currentCapacity" class="counter-value">0</span> / <span id="maxCapacity">100</span>
                             </h2>
-                            <p class="text-gray-600">Slot Parkir Tersedia</p>
-                            <div class="mt-2">
-                                <div id="capacityStatus" class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 text-green-800">
-                                    <span class="material-icons text-sm">check_circle</span>
-                                    <span class="text-sm font-semibold">Normal</span>
-                                </div>
+                            <p class="text-gray-600 font-medium mb-3">Slot Parkir Tersedia</p>
+                            <div id="capacityStatus" class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-green-100 text-green-800 shadow-sm">
+                                <span class="material-icons text-sm">check_circle</span>
+                                <span class="text-sm font-bold">Normal</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex space-x-3">
-                        <a href="inDiv.html" class="flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition shadow-md">
-                            <span class="material-icons">login</span>
-                            <span class="font-semibold">Kendaraan Masuk</span>
-                        </a>
-                        <a href="outDiv.html" class="flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition shadow-md">
-                            <span class="material-icons">logout</span>
-                            <span class="font-semibold">Kendaraan Keluar</span>
-                        </a>
+                    <!-- Quick Actions -->
+                    <div class="flex flex-col space-y-3">
+                        <div class="flex space-x-3">
+                            <a href="inDiv.html" class="quick-action-btn flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-8 py-4 rounded-xl transition shadow-lg hover:shadow-xl">
+                                <span class="material-icons text-2xl">login</span>
+                                <div class="text-left">
+                                    <p class="font-bold">Kendaraan Masuk</p>
+                                    <p class="text-xs opacity-90">Scan atau Input Manual</p>
+                                </div>
+                            </a>
+                            <a href="outDiv.html" class="quick-action-btn flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-8 py-4 rounded-xl transition shadow-lg hover:shadow-xl">
+                                <span class="material-icons text-2xl">logout</span>
+                                <div class="text-left">
+                                    <p class="font-bold">Kendaraan Keluar</p>
+                                    <p class="text-xs opacity-90">Cari & Proses</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between space-x-2 bg-gray-50 rounded-lg p-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-sm text-gray-600" id="autoRefreshIcon">sync</span>
+                                <span class="text-xs text-gray-600">Auto-refresh</span>
+                            </div>
+                            <button onclick="toggleAutoRefresh()" id="autoRefreshBtn" class="text-xs bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition">
+                                ON
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.1s">
+            <!-- Enhanced Statistics Cards with Trends -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md p-6 border border-blue-100 animate-fade-in-up" style="animation-delay: 0.1s">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Total Parkir</p>
-                            <p class="text-3xl font-bold text-gray-800 mt-2" id="totalParked">0</p>
-                            <p class="text-xs text-gray-400 mt-1">Kendaraan aktif</p>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <p class="text-gray-600 text-sm font-semibold">Total Parkir</p>
+                                <span id="totalTrend" class="text-xs"></span>
+                            </div>
+                            <p class="text-4xl font-black text-gray-800 counter-value" id="totalParked">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Kendaraan aktif saat ini</p>
                         </div>
-                        <div class="bg-blue-100 p-4 rounded-full">
-                            <span class="material-icons text-4xl text-blue-600">directions_car</span>
+                        <div class="bg-blue-500 bg-opacity-10 p-4 rounded-2xl">
+                            <span class="material-icons text-5xl text-blue-600">directions_car</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.2s">
+                <div class="stat-card bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md p-6 border border-green-100 animate-fade-in-up" style="animation-delay: 0.2s">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Mahasiswa</p>
-                            <p class="text-3xl font-bold text-green-600 mt-2" id="totalMhs">0</p>
-                            <p class="text-xs text-gray-400 mt-1">Gratis parkir</p>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <p class="text-gray-600 text-sm font-semibold">Mahasiswa</p>
+                                <span class="badge badge-success text-xs px-2 py-0.5">GRATIS</span>
+                            </div>
+                            <p class="text-4xl font-black text-green-600 counter-value" id="totalMhs">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Parkir gratis</p>
                         </div>
-                        <div class="bg-green-100 p-4 rounded-full">
-                            <span class="material-icons text-4xl text-green-600">school</span>
+                        <div class="bg-green-500 bg-opacity-10 p-4 rounded-2xl">
+                            <span class="material-icons text-5xl text-green-600">school</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="stat-card bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md p-6 border border-purple-100 animate-fade-in-up" style="animation-delay: 0.3s">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Staff</p>
-                            <p class="text-3xl font-bold text-purple-600 mt-2" id="totalStaff">0</p>
-                            <p class="text-xs text-gray-400 mt-1">Gratis parkir</p>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <p class="text-gray-600 text-sm font-semibold">Staff</p>
+                                <span class="badge badge-purple text-xs px-2 py-0.5">GRATIS</span>
+                            </div>
+                            <p class="text-4xl font-black text-purple-600 counter-value" id="totalStaff">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Parkir gratis</p>
                         </div>
-                        <div class="bg-purple-100 p-4 rounded-full">
-                            <span class="material-icons text-4xl text-purple-600">badge</span>
+                        <div class="bg-purple-500 bg-opacity-10 p-4 rounded-2xl">
+                            <span class="material-icons text-5xl text-purple-600">badge</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="stat-card bg-gradient-to-br from-orange-50 to-white rounded-xl shadow-md p-6 border border-orange-100 animate-fade-in-up" style="animation-delay: 0.4s">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm font-medium">Tamu & Kantin</p>
-                            <p class="text-3xl font-bold text-orange-600 mt-2" id="totalOther">0</p>
-                            <p class="text-xs text-gray-400 mt-1">Mix gratis/berbayar</p>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <p class="text-gray-600 text-sm font-semibold">Tamu & Kantin</p>
+                                <span class="badge badge-warning text-xs px-2 py-0.5">MIX</span>
+                            </div>
+                            <p class="text-4xl font-black text-orange-600 counter-value" id="totalOther">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Gratis & berbayar</p>
                         </div>
-                        <div class="bg-orange-100 p-4 rounded-full">
-                            <span class="material-icons text-4xl text-orange-600">people</span>
+                        <div class="bg-orange-500 bg-opacity-10 p-4 rounded-2xl">
+                            <span class="material-icons text-5xl text-orange-600">people</span>
                         </div>
                     </div>
                 </div>
@@ -156,117 +303,206 @@
 
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- Parking Table -->
+                <!-- Enhanced Parking Table -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg shadow-md animate-fade-in-up" style="animation-delay: 0.5s">
-                        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="material-icons text-gray-700">list</span>
-                                <h2 class="text-lg font-semibold text-gray-800">Kendaraan Parkir Saat Ini</h2>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="refreshData()" class="flex items-center space-x-1 text-green-600 hover:text-green-700 px-3 py-1 rounded-lg hover:bg-green-50 transition">
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 animate-fade-in-up" style="animation-delay: 0.5s">
+                        <!-- Table Header with Search & Filter -->
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-2">
+                                    <span class="material-icons text-gray-700">list</span>
+                                    <h2 class="text-xl font-bold text-gray-800">Kendaraan Parkir</h2>
+                                    <span id="vehicleCount" class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">0</span>
+                                </div>
+                                <button onclick="refreshData()" class="flex items-center space-x-1 text-green-600 hover:text-green-700 px-3 py-2 rounded-lg hover:bg-green-50 transition" title="Refresh (F5)">
                                     <span class="material-icons text-sm">refresh</span>
                                     <span class="text-sm font-medium">Refresh</span>
                                 </button>
-                                <select id="filterCategory" onchange="filterVehicles()" class="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+                            
+                            <!-- Search and Filter Row -->
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-1 relative">
+                                    <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">search</span>
+                                    <input type="text" id="searchInput" placeholder="Cari plat nomor, NIM, atau nama..." 
+                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg search-input focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                        oninput="handleSearch()">
+                                </div>
+                                <select id="filterCategory" onchange="handleFilter()" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm font-medium">
                                     <option value="ALL">Semua Kategori</option>
                                     <option value="MAHASISWA">Mahasiswa</option>
                                     <option value="STAFF">Staff</option>
                                     <option value="KANTIN">Kantin</option>
                                     <option value="TAMU">Tamu</option>
                                 </select>
+                                <button onclick="exportCurrentData()" class="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium" title="Export Data (Ctrl+E)">
+                                    <span class="material-icons text-sm">download</span>
+                                    <span>Export</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
-                            <table class="w-full table-hover">
-                                <thead class="bg-gray-50 sticky top-0">
+                        
+                        <!-- Table Body with Loading State -->
+                        <div class="overflow-x-auto scrollbar-thin" style="max-height: 520px; overflow-y: auto;">
+                            <div id="tableLoading" class="hidden p-6">
+                                <div class="space-y-3">
+                                    <div class="skeleton h-12 rounded"></div>
+                                    <div class="skeleton h-12 rounded"></div>
+                                    <div class="skeleton h-12 rounded"></div>
+                                    <div class="skeleton h-12 rounded"></div>
+                                </div>
+                            </div>
+                            <table class="w-full" id="parkingTable">
+                                <thead class="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Masuk</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID/NIM</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plat Nomor</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durasi</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gate</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition" onclick="sortTable('time')">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Waktu Masuk</span>
+                                                <span class="material-icons text-sm" id="sortTimeIcon">unfold_more</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID/NIM</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kategori</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition" onclick="sortTable('plate')">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Plat Nomor</span>
+                                                <span class="material-icons text-sm" id="sortPlateIcon">unfold_more</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Durasi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Gate</th>
                                     </tr>
                                 </thead>
                                 <tbody id="parkingTableBody" class="divide-y divide-gray-200 bg-white">
                                     <!-- Data will be populated by JavaScript -->
                                 </tbody>
                             </table>
+                            <!-- Empty State -->
+                            <div id="emptyState" class="hidden p-12 text-center">
+                                <span class="material-icons text-6xl text-gray-300 mb-4">inbox</span>
+                                <p class="text-gray-500 font-medium text-lg">Tidak ada kendaraan parkir</p>
+                                <p class="text-gray-400 text-sm mt-2">Data akan muncul saat ada kendaraan masuk</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sidebar Info -->
+                <!-- Enhanced Sidebar -->
                 <div class="space-y-4">
-                    <!-- Daily Statistics -->
-                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.6s">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <span class="material-icons text-gray-700">today</span>
-                            <h3 class="text-lg font-semibold text-gray-800">Statistik Hari Ini</h3>
+                    <!-- Daily Statistics with Charts -->
+                    <div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 border border-blue-100 animate-fade-in-up" style="animation-delay: 0.6s">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-blue-600">today</span>
+                                <h3 class="text-lg font-bold text-gray-800">Hari Ini</h3>
+                            </div>
+                            <span class="text-xs text-gray-500" id="todayDate"></span>
                         </div>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center pb-3 border-b">
-                                <span class="text-gray-600 text-sm">Total Masuk</span>
-                                <span class="font-semibold text-green-600 text-lg" id="todayIn">0</span>
+                        <div class="space-y-4">
+                            <div class="bg-white rounded-xl p-4 border border-blue-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-600 text-sm font-medium">Total Masuk</span>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="material-icons text-green-600 text-lg">trending_up</span>
+                                        <span class="font-black text-green-600 text-2xl counter-value" id="todayIn">0</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="progressIn" class="progress-fill" style="width: 0%"></div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center pb-3 border-b">
-                                <span class="text-gray-600 text-sm">Total Keluar</span>
-                                <span class="font-semibold text-red-600 text-lg" id="todayOut">0</span>
+                            
+                            <div class="bg-white rounded-xl p-4 border border-blue-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-600 text-sm font-medium">Total Keluar</span>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="material-icons text-red-600 text-lg">trending_down</span>
+                                        <span class="font-black text-red-600 text-2xl counter-value" id="todayOut">0</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="progressOut" class="progress-fill bg-gradient-to-r from-red-500 to-red-400" style="width: 0%"></div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center pb-3 border-b">
-                                <span class="text-gray-600 text-sm">Rata-rata Durasi</span>
-                                <span class="font-semibold text-gray-800 text-lg" id="avgDuration">0 menit</span>
+                            
+                            <div class="bg-white rounded-xl p-4 border border-blue-100">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 text-sm font-medium">Rata-rata Durasi</span>
+                                    <div class="text-right">
+                                        <span class="font-black text-gray-800 text-xl" id="avgDuration">0</span>
+                                        <span class="text-gray-500 text-sm ml-1">menit</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600 text-sm">Peak Hour</span>
-                                <span class="font-semibold text-gray-800" id="peakHour">-</span>
+                            
+                            <div class="bg-white rounded-xl p-4 border border-blue-100">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 text-sm font-medium">Peak Hour</span>
+                                    <span class="font-bold text-gray-800" id="peakHour">-</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Overstay Alerts -->
-                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.7s">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <span class="material-icons text-orange-600">warning</span>
-                            <h3 class="text-lg font-semibold text-gray-800">Peringatan Overstay</h3>
+                    <div class="bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-xl p-6 border border-orange-100 animate-fade-in-up" style="animation-delay: 0.7s">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-orange-600">warning</span>
+                                <h3 class="text-lg font-bold text-gray-800">Overstay Alert</h3>
+                            </div>
+                            <span id="overstayCount" class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-bold">0</span>
                         </div>
-                        <div id="overstayList" class="space-y-2">
-                            <p class="text-sm text-gray-500 text-center py-4">Tidak ada kendaraan overstay</p>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.8s">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <span class="material-icons text-gray-700">bolt</span>
-                            <h3 class="text-lg font-semibold text-gray-800">Aksi Cepat</h3>
-                        </div>
-                        <div class="space-y-2">
-                            <a href="report.html" class="flex items-center justify-between w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                                <span class="text-sm">Laporan</span>
-                                <span class="material-icons text-sm">arrow_forward</span>
-                            </a>
-                            <a href="settings.html" class="flex items-center justify-between w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition">
-                                <span class="text-sm">Pengaturan</span>
-                                <span class="material-icons text-sm">arrow_forward</span>
-                            </a>
-                            <button onclick="exportCurrentData()" class="flex items-center justify-between w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
-                                <span class="text-sm">Export Data</span>
-                                <span class="material-icons text-sm">download</span>
-                            </button>
+                        <div id="overstayList" class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin">
+                            <div class="text-center py-8">
+                                <span class="material-icons text-4xl text-gray-300 mb-2">check_circle</span>
+                                <p class="text-sm text-gray-500">Tidak ada kendaraan overstay</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Recent Activity -->
-                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.9s">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <span class="material-icons text-gray-700">history</span>
-                            <h3 class="text-lg font-semibold text-gray-800">Aktivitas Terakhir</h3>
+                    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border border-gray-200 animate-fade-in-up" style="animation-delay: 0.8s">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-gray-700">history</span>
+                                <h3 class="text-lg font-bold text-gray-800">Aktivitas Terkini</h3>
+                            </div>
+                            <button onclick="refreshActivity()" class="text-gray-400 hover:text-gray-600 transition">
+                                <span class="material-icons text-sm">refresh</span>
+                            </button>
                         </div>
-                        <div id="recentActivity" class="space-y-2 max-h-64 overflow-y-auto">
-                            <!-- Activity logs will be populated here -->
+                        <div id="recentActivity" class="space-y-2 max-h-80 overflow-y-auto scrollbar-thin">
+                            <div class="text-center py-8">
+                                <span class="material-icons text-4xl text-gray-300 mb-2">history</span>
+                                <p class="text-sm text-gray-500">Belum ada aktivitas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Panel -->
+                    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border border-gray-200 animate-fade-in-up" style="animation-delay: 0.9s">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="material-icons text-gray-700">bolt</span>
+                            <h3 class="text-lg font-bold text-gray-800">Aksi Cepat</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="report.html" class="quick-action-btn flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl transition text-center">
+                                <span class="material-icons text-2xl mb-1">assessment</span>
+                                <span class="text-xs font-medium">Laporan</span>
+                            </a>
+                            <a href="settings.html" class="quick-action-btn flex flex-col items-center justify-center bg-gray-600 hover:bg-gray-700 text-white p-4 rounded-xl transition text-center">
+                                <span class="material-icons text-2xl mb-1">settings</span>
+                                <span class="text-xs font-medium">Pengaturan</span>
+                            </a>
+                            <button onclick="clearAllData()" class="quick-action-btn flex flex-col items-center justify-center bg-red-600 hover:bg-red-700 text-white p-4 rounded-xl transition text-center">
+                                <span class="material-icons text-2xl mb-1">delete_sweep</span>
+                                <span class="text-xs font-medium">Clear Data</span>
+                            </button>
+                            <button onclick="printDashboard()" class="quick-action-btn flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl transition text-center">
+                                <span class="material-icons text-2xl mb-1">print</span>
+                                <span class="text-xs font-medium">Print</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -282,41 +518,109 @@
     <script src="js/cameraScan.js"></script>
     
     <script>
-        // Initialize session
+        // ============================================
+        // Global State
+        // ============================================
+        let autoRefreshEnabled = true;
+        let autoRefreshInterval;
+        let currentFilter = 'ALL';
+        let currentSearch = '';
+        let sortBy = 'time';
+        let sortOrder = 'desc';
+        let previousTotal = 0;
+
+        // ============================================
+        // Toast Notification System
+        // ============================================
+        function showToast(message, type = 'success', duration = 3000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-orange-600',
+                info: 'bg-blue-600'
+            };
+            
+            const icons = {
+                success: 'check_circle',
+                error: 'error',
+                warning: 'warning',
+                info: 'info'
+            };
+            
+            toast.className = `${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 min-w-[300px] animate-slide-in-right`;
+            toast.innerHTML = `
+                <span class="material-icons">${icons[type]}</span>
+                <span class="flex-1 font-medium">${message}</span>
+                <button onclick="this.parentElement.remove()" class="material-icons text-sm hover:opacity-70">close</button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ============================================
+        // Initialize Session
+        // ============================================
         function initSession() {
             const session = AuditSystem.getCurrentSession();
+            const sessionInfo = document.getElementById('sessionInfo');
             if (session.isAuthenticated) {
-                document.getElementById('sessionInfo').textContent = `${session.user} - ${session.gate}`;
+                sessionInfo.textContent = `${session.user} - ${session.gate}`;
+            } else {
+                sessionInfo.textContent = 'System';
             }
         }
 
-        // Update time
+        // ============================================
+        // Update Clock
+        // ============================================
         function updateTime() {
             const now = new Date();
-            document.getElementById('currentTime').textContent = now.toLocaleString('id-ID', {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+            
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('id-ID', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
             });
+            
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            document.getElementById('todayDate').textContent = now.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long'
+            });
         }
 
-        // Calculate duration
+        // ============================================
+        // Calculate Duration
+        // ============================================
         function calculateDuration(timeIn) {
             const now = new Date();
             const diff = now - new Date(timeIn);
             const minutes = Math.floor(diff / 60000);
             const hours = Math.floor(minutes / 60);
+            
             if (hours > 0) {
                 return `${hours}j ${minutes % 60}m`;
             }
             return `${minutes}m`;
         }
 
-        // Get category badge
+        // ============================================
+        // Get Category Badge
+        // ============================================
         function getCategoryBadge(category) {
             const badges = {
                 'MAHASISWA': '<span class="badge badge-success"><span class="material-icons md-18">school</span>Mahasiswa</span>',
@@ -327,7 +631,9 @@
             return badges[category] || category;
         }
 
-        // Update capacity indicator
+        // ============================================
+        // Update Capacity Indicator
+        // ============================================
         function updateCapacityIndicator() {
             const config = ParkingSystem.getConfig();
             const stats = ParkingSystem.getStatistics();
@@ -335,44 +641,61 @@
             const max = config.maxCapacity;
             const percent = Math.round((current / max) * 100);
             
-            document.getElementById('currentCapacity').textContent = current;
+            const currentEl = document.getElementById('currentCapacity');
+            if (current !== previousTotal) {
+                currentEl.classList.add('updated');
+                setTimeout(() => currentEl.classList.remove('updated'), 500);
+            }
+            previousTotal = current;
+            
+            currentEl.textContent = current;
             document.getElementById('maxCapacity').textContent = max;
             document.getElementById('capacityPercent').textContent = percent + '%';
             
-            // Update circle
+            // Update circle with smooth animation
             const circle = document.getElementById('capacityCircle');
-            const circumference = 2 * Math.PI * 52;
+            const circumference = 2 * Math.PI * 62;
             const offset = circumference - (percent / 100) * circumference;
             circle.style.strokeDashoffset = offset;
             
-            // Update status
+            // Update status with thresholds
             const statusDiv = document.getElementById('capacityStatus');
             let statusHtml = '';
             
             if (percent >= 90) {
                 circle.style.stroke = '#dc2626';
-                statusHtml = '<span class="material-icons text-sm">error</span><span class="text-sm font-semibold">Hampir Penuh</span>';
-                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100 text-red-800 animate-pulse';
+                statusHtml = '<span class="material-icons text-sm">error</span><span class="text-sm font-bold">PENUH</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-red-100 text-red-800 shadow-sm badge-animated';
             } else if (percent >= 70) {
                 circle.style.stroke = '#f59e0b';
-                statusHtml = '<span class="material-icons text-sm">warning</span><span class="text-sm font-semibold">Perhatian</span>';
-                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800';
+                statusHtml = '<span class="material-icons text-sm">warning</span><span class="text-sm font-bold">Perhatian</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-orange-100 text-orange-800 shadow-sm';
             } else {
                 circle.style.stroke = '#15803d';
-                statusHtml = '<span class="material-icons text-sm">check_circle</span><span class="text-sm font-semibold">Normal</span>';
-                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 text-green-800';
+                statusHtml = '<span class="material-icons text-sm">check_circle</span><span class="text-sm font-bold">Normal</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-green-100 text-green-800 shadow-sm';
             }
             
             statusDiv.innerHTML = statusHtml;
         }
 
-        // Check overstay vehicles
+        // ============================================
+        // Check Overstay Vehicles
+        // ============================================
         function checkOverstayVehicles() {
             const overstay = ValidationRules.checkOverstay();
             const overstayList = document.getElementById('overstayList');
+            const overstayCount = document.getElementById('overstayCount');
+            
+            overstayCount.textContent = overstay.length;
             
             if (overstay.length === 0) {
-                overstayList.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada kendaraan overstay</p>';
+                overstayList.innerHTML = `
+                    <div class="text-center py-8">
+                        <span class="material-icons text-4xl text-gray-300 mb-2">check_circle</span>
+                        <p class="text-sm text-gray-500">Tidak ada kendaraan overstay</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -380,12 +703,15 @@
             overstay.forEach(v => {
                 const duration = calculateDuration(v.timeIn);
                 html += `
-                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="font-semibold text-sm text-gray-800">${v.plate}</span>
+                    <div class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-3 hover:bg-orange-100 transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-sm text-gray-800">${v.plate}</span>
                             ${getCategoryBadge(v.category)}
                         </div>
-                        <p class="text-xs text-gray-600">Durasi: ${duration}</p>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600">${v.identifier}</span>
+                            <span class="text-orange-600 font-bold">${duration}</span>
+                        </div>
                     </div>
                 `;
             });
@@ -393,13 +719,20 @@
             overstayList.innerHTML = html;
         }
 
-        // Update recent activity
+        // ============================================
+        // Update Recent Activity
+        // ============================================
         function updateRecentActivity() {
-            const logs = AuditSystem.getTodayLogs().slice(-5).reverse();
+            const logs = AuditSystem.getTodayLogs().slice(-10).reverse();
             const activityDiv = document.getElementById('recentActivity');
             
             if (logs.length === 0) {
-                activityDiv.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada aktivitas</p>';
+                activityDiv.innerHTML = `
+                    <div class="text-center py-8">
+                        <span class="material-icons text-4xl text-gray-300 mb-2">history</span>
+                        <p class="text-sm text-gray-500">Belum ada aktivitas</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -408,22 +741,29 @@
                 const time = new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 let icon = 'info';
                 let bgColor = 'bg-gray-50';
+                let borderColor = 'border-l-gray-400';
                 
                 if (log.action === 'VEHICLE_IN') {
                     icon = 'login';
                     bgColor = 'bg-green-50';
+                    borderColor = 'border-l-green-500';
                 } else if (log.action === 'VEHICLE_OUT') {
                     icon = 'logout';
                     bgColor = 'bg-red-50';
+                    borderColor = 'border-l-red-500';
+                } else if (log.action === 'USER_LOGIN') {
+                    icon = 'person';
+                    bgColor = 'bg-blue-50';
+                    borderColor = 'border-l-blue-500';
                 }
                 
                 html += `
-                    <div class="${bgColor} border border-gray-200 rounded-lg p-2">
-                        <div class="flex items-center space-x-2">
-                            <span class="material-icons text-sm text-gray-600">${icon}</span>
+                    <div class="${bgColor} border-l-4 ${borderColor} rounded-lg p-3 hover:shadow-md transition">
+                        <div class="flex items-start space-x-3">
+                            <span class="material-icons text-sm text-gray-600 mt-0.5">${icon}</span>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-medium text-gray-800 truncate">${log.action.replace(/_/g, ' ')}</p>
-                                <p class="text-xs text-gray-500">${time} - ${log.user}</p>
+                                <p class="text-xs font-semibold text-gray-800">${log.action.replace(/_/g, ' ')}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">${time} • ${log.user}</p>
                             </div>
                         </div>
                     </div>
@@ -433,61 +773,129 @@
             activityDiv.innerHTML = html;
         }
 
-        // Filter vehicles
-        function filterVehicles() {
-            const filter = document.getElementById('filterCategory').value;
-            refreshData(filter);
+        // ============================================
+        // Handle Search with Debounce
+        // ============================================
+        let searchDebounce;
+        function handleSearch() {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                currentSearch = document.getElementById('searchInput').value.toLowerCase();
+                refreshData();
+            }, 300);
         }
 
-        // Refresh data
-        function refreshData(filter = 'ALL') {
-            let parked = ParkingSystem.getParkedVehicles();
-            
-            if (filter !== 'ALL') {
-                parked = parked.filter(v => v.category === filter);
+        // ============================================
+        // Handle Filter
+        // ============================================
+        function handleFilter() {
+            currentFilter = document.getElementById('filterCategory').value;
+            refreshData();
+        }
+
+        // ============================================
+        // Sort Table
+        // ============================================
+        function sortTable(column) {
+            if (sortBy === column) {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortBy = column;
+                sortOrder = 'desc';
             }
             
-            const stats = ParkingSystem.getStatistics();
+            // Update icons
+            document.getElementById('sortTimeIcon').textContent = sortBy === 'time' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more';
+            document.getElementById('sortPlateIcon').textContent = sortBy === 'plate' ? (sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more';
+            
+            refreshData();
+        }
 
+        // ============================================
+        // Refresh Data (Main Function)
+        // ============================================
+        function refreshData() {
+            // Show loading state
+            const tableBody = document.getElementById('parkingTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const vehicleCount = document.getElementById('vehicleCount');
+            
+            let parked = ParkingSystem.getParkedVehicles();
+            
+            // Apply filter
+            if (currentFilter !== 'ALL') {
+                parked = parked.filter(v => v.category === currentFilter);
+            }
+            
+            // Apply search
+            if (currentSearch) {
+                parked = parked.filter(v => 
+                    v.plate.toLowerCase().includes(currentSearch) ||
+                    v.identifier.toLowerCase().includes(currentSearch) ||
+                    v.category.toLowerCase().includes(currentSearch)
+                );
+            }
+            
+            // Apply sort
+            if (sortBy === 'time') {
+                parked.sort((a, b) => {
+                    const compare = new Date(a.timeIn) - new Date(b.timeIn);
+                    return sortOrder === 'asc' ? compare : -compare;
+                });
+            } else if (sortBy === 'plate') {
+                parked.sort((a, b) => {
+                    const compare = a.plate.localeCompare(b.plate);
+                    return sortOrder === 'asc' ? compare : -compare;
+                });
+            }
+            
+            vehicleCount.textContent = parked.length;
+            
+            // Update statistics
+            const stats = ParkingSystem.getStatistics();
             document.getElementById('totalParked').textContent = stats.total;
             document.getElementById('totalMhs').textContent = stats.mahasiswa;
             document.getElementById('totalStaff').textContent = stats.staff;
             document.getElementById('totalOther').textContent = stats.kantin + stats.tamu;
 
-            const tbody = document.getElementById('parkingTableBody');
-            tbody.innerHTML = '';
+            // Update table
+            tableBody.innerHTML = '';
 
             if (parked.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center">
-                            <span class="material-icons text-5xl text-gray-400">inbox</span>
-                            <p class="mt-2 text-gray-500">Tidak ada kendaraan parkir</p>
-                        </td>
-                    </tr>
-                `;
+                emptyState.classList.remove('hidden');
+                document.getElementById('parkingTable').classList.add('hidden');
                 return;
             }
 
-            parked.forEach(vehicle => {
+            emptyState.classList.add('hidden');
+            document.getElementById('parkingTable').classList.remove('hidden');
+
+            parked.forEach((vehicle, index) => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition';
+                row.className = 'hover:bg-gray-50 transition cursor-pointer table-row-enter';
+                row.style.animationDelay = `${index * 0.03}s`;
+                row.onclick = () => showVehicleDetail(vehicle);
                 row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-gray-900">${new Date(vehicle.timeIn).toLocaleTimeString('id-ID')}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">${new Date(vehicle.timeIn).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</td>
                     <td class="px-6 py-4 text-sm font-medium text-gray-900">${vehicle.identifier}</td>
                     <td class="px-6 py-4 text-sm">${getCategoryBadge(vehicle.category)}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 font-semibold">${vehicle.plate}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${calculateDuration(vehicle.timeIn)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 font-bold">${vehicle.plate}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 font-semibold">${calculateDuration(vehicle.timeIn)}</td>
                     <td class="px-6 py-4 text-sm text-gray-600">${vehicle.gate || '-'}</td>
                 `;
-                tbody.appendChild(row);
+                tableBody.appendChild(row);
             });
 
             // Update daily statistics
             const history = ParkingSystem.getTodayHistory();
             document.getElementById('todayIn').textContent = history.in;
             document.getElementById('todayOut').textContent = history.out;
-            document.getElementById('avgDuration').textContent = history.avgDuration + ' menit';
+            document.getElementById('avgDuration').textContent = history.avgDuration;
+            
+            // Update progress bars
+            const maxDaily = Math.max(history.in, history.out, 1);
+            document.getElementById('progressIn').style.width = `${(history.in / maxDaily) * 100}%`;
+            document.getElementById('progressOut').style.width = `${(history.out / maxDaily) * 100}%`;
 
             // Update capacity
             updateCapacityIndicator();
@@ -499,11 +907,64 @@
             updateRecentActivity();
         }
 
-        // Export current data
+        // ============================================
+        // Show Vehicle Detail Modal (Optional)
+        // ============================================
+        function showVehicleDetail(vehicle) {
+            const duration = calculateDuration(vehicle.timeIn);
+            showToast(`${vehicle.plate} - Durasi: ${duration}`, 'info', 2000);
+        }
+
+        // ============================================
+        // Toggle Auto Refresh
+        // ============================================
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const btn = document.getElementById('autoRefreshBtn');
+            const icon = document.getElementById('autoRefreshIcon');
+            
+            if (autoRefreshEnabled) {
+                btn.textContent = 'ON';
+                btn.classList.remove('bg-gray-500');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                icon.classList.add('auto-refresh-indicator');
+                startAutoRefresh();
+                showToast('Auto-refresh diaktifkan', 'success', 2000);
+            } else {
+                btn.textContent = 'OFF';
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-gray-500');
+                icon.classList.remove('auto-refresh-indicator');
+                stopAutoRefresh();
+                showToast('Auto-refresh dinonaktifkan', 'warning', 2000);
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(() => {
+                if (autoRefreshEnabled) {
+                    refreshData();
+                }
+            }, 5000); // Refresh every 5 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        }
+
+        // ============================================
+        // Export Current Data
+        // ============================================
         function exportCurrentData() {
             const vehicles = ParkingSystem.getParkedVehicles();
-            const stats = ParkingSystem.getStatistics();
-            const config = ParkingSystem.getConfig();
+            
+            if (vehicles.length === 0) {
+                showToast('Tidak ada data untuk diexport', 'warning');
+                return;
+            }
             
             let csv = 'ID,Plat,Kategori,Identifier,Waktu Masuk,Durasi (menit),Gate,Operator\n';
             
@@ -523,27 +984,120 @@
             document.body.removeChild(link);
             
             AuditSystem.log('DATA_EXPORT', { count: vehicles.length });
+            showToast(`${vehicles.length} data berhasil diexport`, 'success');
         }
 
-        // Open settings
+        // ============================================
+        // Clear All Data
+        // ============================================
+        function clearAllData() {
+            if (confirm('Yakin ingin menghapus semua data parkir? Tindakan ini tidak dapat dibatalkan!')) {
+                ParkingSystem.clearAllData();
+                refreshData();
+                showToast('Semua data berhasil dihapus', 'success');
+                AuditSystem.log('DATA_CLEARED', {});
+            }
+        }
+
+        // ============================================
+        // Print Dashboard
+        // ============================================
+        function printDashboard() {
+            window.print();
+            AuditSystem.log('DASHBOARD_PRINTED', {});
+        }
+
+        // ============================================
+        // Open Settings
+        // ============================================
         function openSettings() {
             window.location.href = 'settings.html';
         }
 
-        // Setup sync listener
-        SyncSystem.addListener('storage_updated', function(data) {
-            refreshData();
+        // ============================================
+        // Refresh Activity
+        // ============================================
+        function refreshActivity() {
+            updateRecentActivity();
+            showToast('Aktivitas direfresh', 'info', 1500);
+        }
+
+        // ============================================
+        // Keyboard Shortcuts
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            // F5 or Ctrl+R - Refresh
+            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                e.preventDefault();
+                refreshData();
+                showToast('Data direfresh', 'info', 1500);
+            }
+            
+            // Ctrl+E - Export
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                exportCurrentData();
+            }
+            
+            // Alt+S - Settings
+            if (e.altKey && e.key === 's') {
+                e.preventDefault();
+                openSettings();
+            }
+            
+            // Ctrl+F - Focus Search
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
         });
 
-        // Initialize
-        initSession();
-        updateTime();
-        setInterval(updateTime, 1000);
-        setInterval(refreshData, 3000);
-        refreshData();
+        // ============================================
+        // Setup Sync Listener
+        // ============================================
+        SyncSystem.addListener('storage_updated', function(data) {
+            if (autoRefreshEnabled) {
+                refreshData();
+                showToast('Data baru masuk!', 'info', 2000);
+            }
+        });
 
-        // Log page view
-        AuditSystem.log('PAGE_VIEW', { page: 'dashboard' });
+        // ============================================
+        // Visibility Change Handler
+        // ============================================
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && autoRefreshEnabled) {
+                refreshData();
+            }
+        });
+
+        // ============================================
+        // Initialize Application
+        // ============================================
+        function init() {
+            initSession();
+            updateTime();
+            refreshData();
+            
+            // Update clock every second
+            setInterval(updateTime, 1000);
+            
+            // Start auto-refresh
+            startAutoRefresh();
+            
+            // Log page view
+            AuditSystem.log('PAGE_VIEW', { page: 'dashboard' });
+            
+            // Show welcome toast
+            setTimeout(() => {
+                showToast('Dashboard siap digunakan', 'success', 2000);
+            }, 500);
+        }
+
+        // ============================================
+        // Start Application
+        // ============================================
+        init();
     </script>
 </body>
 </html>

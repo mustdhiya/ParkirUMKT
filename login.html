@@ -3,25 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#15803d">
     <title>Login - Sistem Parkir FST UMKT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         .login-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #15803d 0%, #166534 50%, #14532d 100%);
             min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-30px, 30px) rotate(5deg); }
         }
         .login-box {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.97);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .umkt-logo {
-            animation: fadeInDown 0.8s ease-out;
+            animation: fadeInDown 0.6s ease-out;
         }
         @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
@@ -29,58 +47,97 @@
             }
         }
         .form-animate {
-            animation: fadeInUp 0.8s ease-out;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
         }
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        .input-focus {
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+        }
+        .logo-pulse {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .footer-animate {
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="login-container flex items-center justify-center px-4">
-        <div class="w-full max-w-md">
+    <div class="login-container flex items-center justify-center px-4 py-8">
+        <div class="w-full max-w-md relative z-10">
+            <!-- Logo & Title -->
             <div class="umkt-logo text-center mb-8">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-4">
-                    <span class="material-icons text-5xl text-green-700">local_parking</span>
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-2xl shadow-2xl mb-5 logo-pulse">
+                    <span class="material-icons text-6xl text-green-700">local_parking</span>
                 </div>
-                <h1 class="text-3xl font-bold text-white mb-2">Sistem Parkir FST</h1>
-                <p class="text-white text-opacity-90">Universitas Muhammadiyah Kalimantan Timur</p>
+                <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Sistem Parkir FST</h1>
+                <p class="text-white text-opacity-90 text-base font-medium">Universitas Muhammadiyah Kalimantan Timur</p>
+                <div class="mt-3 inline-flex items-center space-x-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
+                    <span class="material-icons text-white text-sm">verified</span>
+                    <span class="text-white text-sm font-semibold">Gate Management System v2.0</span>
+                </div>
             </div>
 
+            <!-- Login Form -->
             <div class="login-box rounded-2xl shadow-2xl p-8 form-animate">
-                <div class="text-center mb-6">
+                <div class="text-center mb-7">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mb-4 shadow-lg">
+                        <span class="material-icons text-white text-3xl">admin_panel_settings</span>
+                    </div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-2">Login Petugas</h2>
                     <p class="text-gray-600 text-sm">Masukkan kredensial Anda untuk melanjutkan</p>
                 </div>
 
                 <form id="loginForm" class="space-y-5">
+                    <!-- Username -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="flex items-center space-x-1">
-                                <span class="material-icons text-sm">person</span>
+                                <span class="material-icons text-base">person</span>
                                 <span>Username</span>
                             </span>
                         </label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition" 
-                            placeholder="Masukkan username"
-                            required
-                            autocomplete="username">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                class="w-full px-4 py-3 pl-11 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition font-medium" 
+                                placeholder="Masukkan username"
+                                required
+                                autocomplete="username">
+                            <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">account_circle</span>
+                        </div>
                     </div>
 
+                    <!-- Password -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="flex items-center space-x-1">
-                                <span class="material-icons text-sm">lock</span>
+                                <span class="material-icons text-base">lock</span>
                                 <span>Password</span>
                             </span>
                         </label>
@@ -88,99 +145,190 @@
                             <input 
                                 type="password" 
                                 id="password" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition pr-12" 
+                                class="w-full px-4 py-3 pl-11 pr-12 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition font-medium" 
                                 placeholder="Masukkan password"
                                 required
                                 autocomplete="current-password">
-                            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                            <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">vpn_key</span>
+                            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 active:scale-90 transition">
                                 <span class="material-icons" id="passwordIcon">visibility_off</span>
                             </button>
                         </div>
                     </div>
 
+                    <!-- Gate Selection -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="flex items-center space-x-1">
-                                <span class="material-icons text-sm">location_on</span>
-                                <span>Gate</span>
+                                <span class="material-icons text-base">location_on</span>
+                                <span>Gate Lokasi</span>
                             </span>
                         </label>
-                        <select id="gate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition" required>
-                            <option value="">Pilih Gate</option>
-                            <option value="GATE_UTARA">Gate Utara (Utama)</option>
-                            <option value="GATE_SELATAN">Gate Selatan</option>
-                            <option value="GATE_BARAT">Gate Barat (Belakang)</option>
-                            <option value="GATE_TIMUR">Gate Timur</option>
-                        </select>
+                        <div class="relative">
+                            <select id="gate" class="w-full px-4 py-3 pl-11 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition font-medium appearance-none" required>
+                                <option value="">-- Pilih Gate --</option>
+                                <option value="GATE_UTARA">🚪 Gate Utara (Utama)</option>
+                                <option value="GATE_SELATAN">🚪 Gate Selatan</option>
+                                <option value="GATE_BARAT">🚪 Gate Barat (Belakang)</option>
+                                <option value="GATE_TIMUR">🚪 Gate Timur</option>
+                            </select>
+                            <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">place</span>
+                            <span class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                        </div>
                     </div>
 
+                    <!-- Shift Selection -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="flex items-center space-x-1">
-                                <span class="material-icons text-sm">schedule</span>
-                                <span>Shift</span>
+                                <span class="material-icons text-base">schedule</span>
+                                <span>Shift Kerja</span>
                             </span>
                         </label>
-                        <select id="shift" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition" required>
-                            <option value="">Pilih Shift</option>
-                            <option value="PAGI">Pagi (07:00 - 14:00)</option>
-                            <option value="SIANG">Siang (14:00 - 21:00)</option>
-                            <option value="MALAM">Malam (21:00 - 07:00)</option>
-                        </select>
+                        <div class="relative">
+                            <select id="shift" class="w-full px-4 py-3 pl-11 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition font-medium appearance-none" required>
+                                <option value="">-- Pilih Shift --</option>
+                                <option value="PAGI">☀️ Pagi (07:00 - 14:00)</option>
+                                <option value="SIANG">🌤️ Siang (14:00 - 21:00)</option>
+                                <option value="MALAM">🌙 Malam (21:00 - 07:00)</option>
+                            </select>
+                            <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">access_time</span>
+                            <span class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1.5 flex items-center ml-1">
+                            <span class="material-icons text-xs mr-1">info</span>
+                            Shift akan terisi otomatis sesuai waktu saat ini
+                        </p>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" id="remember" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-                            <span class="text-sm text-gray-700">Ingat saya</span>
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between pt-2">
+                        <label class="flex items-center space-x-2 cursor-pointer group">
+                            <input type="checkbox" id="remember" class="w-4 h-4 text-green-600 border-2 border-gray-300 rounded focus:ring-green-500 cursor-pointer">
+                            <span class="text-sm text-gray-700 font-medium group-hover:text-green-600 transition">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm text-green-600 hover:text-green-700 font-medium">Lupa password?</a>
+                        <a href="#" onclick="showForgotPassword()" class="text-sm text-green-600 hover:text-green-700 font-semibold transition">Lupa password?</a>
                     </div>
 
-                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2">
-                        <span class="material-icons text-sm">error</span>
-                        <span id="errorText"></span>
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl flex items-center space-x-3 animate-shake">
+                        <div class="bg-red-100 p-1.5 rounded-full">
+                            <span class="material-icons text-red-600 text-lg">error</span>
+                        </div>
+                        <span id="errorText" class="flex-1 font-semibold text-sm"></span>
+                        <button onclick="hideError()" class="text-red-600 hover:text-red-800 active:scale-90 transition">
+                            <span class="material-icons text-lg">close</span>
+                        </button>
                     </div>
 
+                    <!-- Submit Button -->
                     <button 
                         type="submit" 
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        id="loginBtn"
+                        class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 active:scale-95 text-white font-bold py-4 rounded-xl transition flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl text-lg">
                         <span class="material-icons">login</span>
-                        <span>Login</span>
+                        <span>Masuk ke Sistem</span>
                     </button>
                 </form>
 
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-start space-x-2">
-                            <span class="material-icons text-blue-600 text-sm mt-0.5">info</span>
-                            <div>
-                                <p class="text-sm font-semibold text-blue-800 mb-1">Demo Credentials:</p>
-                                <div class="text-xs text-blue-700 space-y-1">
-                                    <p>Admin: <strong>admin</strong> / <strong>admin123</strong></p>
-                                    <p>Petugas: <strong>petugas1</strong> / <strong>petugas123</strong></p>
+                <!-- Demo Credentials -->
+                <div class="mt-6 pt-6 border-t-2 border-gray-100">
+                    <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-4 shadow-sm">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-100 p-2 rounded-lg">
+                                <span class="material-icons text-blue-600 text-lg">info</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-blue-900 mb-2">Demo Credentials:</p>
+                                <div class="text-xs text-blue-800 space-y-1.5">
+                                    <div class="flex items-center justify-between bg-white bg-opacity-60 px-3 py-2 rounded-lg">
+                                        <span class="font-semibold">Admin:</span>
+                                        <code class="bg-blue-100 px-2 py-1 rounded font-mono">admin / admin123</code>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white bg-opacity-60 px-3 py-2 rounded-lg">
+                                        <span class="font-semibold">Petugas:</span>
+                                        <code class="bg-blue-100 px-2 py-1 rounded font-mono">petugas1 / petugas123</code>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Quick Tips -->
+                <div class="mt-4">
+                    <details class="group">
+                        <summary class="flex items-center justify-between cursor-pointer text-sm text-gray-600 hover:text-gray-800 font-semibold p-3 rounded-lg hover:bg-gray-50 transition">
+                            <span class="flex items-center space-x-2">
+                                <span class="material-icons text-base">help_outline</span>
+                                <span>Tips & Keyboard Shortcuts</span>
+                            </span>
+                            <span class="material-icons text-gray-400 group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+                        <div class="mt-2 bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-700 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span>Quick Login</span>
+                                <code class="bg-gray-200 px-2 py-1 rounded font-mono">Ctrl + Enter</code>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Focus Username</span>
+                                <code class="bg-gray-200 px-2 py-1 rounded font-mono">Alt + U</code>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Toggle Password</span>
+                                <code class="bg-gray-200 px-2 py-1 rounded font-mono">Alt + P</code>
+                            </div>
+                        </div>
+                    </details>
+                </div>
             </div>
 
-            <div class="text-center mt-6 text-white text-sm">
-                <p>&copy; 2026 FST UMKT. All rights reserved.</p>
-                <p class="text-white text-opacity-75 mt-1">Unit IT - Fakultas Sains dan Teknologi</p>
+            <!-- Footer -->
+            <div class="text-center mt-8 text-white footer-animate">
+                <p class="text-base font-semibold">&copy; 2026 FST UMKT. All rights reserved.</p>
+                <p class="text-white text-opacity-80 mt-2 text-sm">Unit IT - Fakultas Sains dan Teknologi</p>
+                <div class="mt-3 flex items-center justify-center space-x-4 text-sm">
+                    <a href="#" class="hover:text-green-200 transition flex items-center space-x-1">
+                        <span class="material-icons text-sm">help</span>
+                        <span>Bantuan</span>
+                    </a>
+                    <span class="text-white text-opacity-50">•</span>
+                    <a href="#" class="hover:text-green-200 transition flex items-center space-x-1">
+                        <span class="material-icons text-sm">privacy_tip</span>
+                        <span>Privasi</span>
+                    </a>
+                    <span class="text-white text-opacity-50">•</span>
+                    <a href="#" class="hover:text-green-200 transition flex items-center space-x-1">
+                        <span class="material-icons text-sm">phone</span>
+                        <span>Kontak</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="cameraScan.js"></script>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 space-y-2 z-50 max-w-md"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 flex flex-col items-center space-y-4 shadow-2xl">
+            <div class="loading-spinner"></div>
+            <span class="text-gray-800 font-bold text-lg">Memverifikasi...</span>
+        </div>
+    </div>
+
+    <script src="js/sync.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/audit.js"></script>
+    
     <script>
         // Check if already logged in
-        if (AuthSystem.isLoggedIn()) {
+        if (typeof AuthSystem !== 'undefined' && AuthSystem.isLoggedIn()) {
             window.location.href = 'index.html';
         }
 
-        // Auto-fill from localStorage if remember me was checked
+        // Auto-fill from localStorage
         window.addEventListener('DOMContentLoaded', function() {
             const remembered = localStorage.getItem('remembered_username');
             const rememberedGate = localStorage.getItem('remembered_gate');
@@ -191,22 +339,34 @@
                 document.getElementById('remember').checked = true;
                 if (rememberedGate) document.getElementById('gate').value = rememberedGate;
                 if (rememberedShift) document.getElementById('shift').value = rememberedShift;
+                
+                // Focus password if username remembered
+                setTimeout(() => document.getElementById('password').focus(), 100);
+            } else {
+                document.getElementById('username').focus();
             }
 
             // Auto-select shift based on current time
             autoSelectShift();
+            
+            // Show welcome message
+            setTimeout(() => {
+                showToast('👋 Selamat datang! Silakan login untuk melanjutkan', 'info', 4000);
+            }, 500);
         });
 
         function autoSelectShift() {
             const hour = new Date().getHours();
             const shiftSelect = document.getElementById('shift');
             
-            if (hour >= 7 && hour < 14) {
-                shiftSelect.value = 'PAGI';
-            } else if (hour >= 14 && hour < 21) {
-                shiftSelect.value = 'SIANG';
-            } else {
-                shiftSelect.value = 'MALAM';
+            if (!shiftSelect.value) {
+                if (hour >= 7 && hour < 14) {
+                    shiftSelect.value = 'PAGI';
+                } else if (hour >= 14 && hour < 21) {
+                    shiftSelect.value = 'SIANG';
+                } else {
+                    shiftSelect.value = 'MALAM';
+                }
             }
         }
 
@@ -229,14 +389,54 @@
             
             errorText.textContent = message;
             errorDiv.classList.remove('hidden');
+            errorDiv.classList.add('animate-shake');
             
             setTimeout(() => {
-                errorDiv.classList.add('hidden');
-            }, 5000);
+                errorDiv.classList.remove('animate-shake');
+            }, 500);
         }
 
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-orange-600',
+                info: 'bg-blue-600'
+            };
+            
+            toast.className = `${colors[type]} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 toast max-w-md`;
+            toast.innerHTML = `
+                <span class="font-semibold flex-1">${message}</span>
+                <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 active:scale-90 transition">
+                    <span class="material-icons text-xl">close</span>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), duration);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+        }
+
+        function showForgotPassword() {
+            event.preventDefault();
+            showToast('📧 Hubungi admin untuk reset password: admin@fst.umkt.ac.id', 'info', 6000);
+        }
+
+        // Form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            hideError();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
@@ -247,63 +447,120 @@
             // Validation
             if (!username || !password) {
                 showError('Username dan password harus diisi');
+                const field = !username ? 'username' : 'password';
+                document.getElementById(field).focus();
+                document.getElementById(field).classList.add('input-focus');
+                setTimeout(() => document.getElementById(field).classList.remove('input-focus'), 2000);
                 return;
             }
 
             if (!gate) {
-                showError('Pilih gate terlebih dahulu');
+                showError('Pilih gate lokasi terlebih dahulu');
+                document.getElementById('gate').focus();
                 return;
             }
 
             if (!shift) {
-                showError('Pilih shift terlebih dahulu');
+                showError('Pilih shift kerja terlebih dahulu');
+                document.getElementById('shift').focus();
                 return;
             }
 
-            // Attempt login
-            const loginResult = AuthSystem.login(username, password, gate, shift);
+            // Show loading
+            showLoading(true);
+            document.getElementById('loginBtn').disabled = true;
 
-            if (loginResult.success) {
-                // Remember me functionality
-                if (remember) {
-                    localStorage.setItem('remembered_username', username);
-                    localStorage.setItem('remembered_gate', gate);
-                    localStorage.setItem('remembered_shift', shift);
+            // Simulate network delay
+            setTimeout(() => {
+                // Attempt login
+                const loginResult = typeof AuthSystem !== 'undefined' 
+                    ? AuthSystem.login(username, password, gate, shift)
+                    : { success: false, message: 'AuthSystem not loaded' };
+
+                showLoading(false);
+                document.getElementById('loginBtn').disabled = false;
+
+                if (loginResult.success) {
+                    // Remember me functionality
+                    if (remember) {
+                        localStorage.setItem('remembered_username', username);
+                        localStorage.setItem('remembered_gate', gate);
+                        localStorage.setItem('remembered_shift', shift);
+                    } else {
+                        localStorage.removeItem('remembered_username');
+                        localStorage.removeItem('remembered_gate');
+                        localStorage.removeItem('remembered_shift');
+                    }
+
+                    // Show success
+                    showToast('✓ Login berhasil! Mengalihkan ke dashboard...', 'success');
+                    
+                    // Log audit
+                    if (typeof AuditSystem !== 'undefined') {
+                        AuditSystem.log('LOGIN_SUCCESS', { username, gate, shift });
+                    }
+
+                    // Redirect with smooth transition
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
                 } else {
-                    localStorage.removeItem('remembered_username');
-                    localStorage.removeItem('remembered_gate');
-                    localStorage.removeItem('remembered_shift');
+                    showError(loginResult.message || 'Username atau password salah');
+                    
+                    // Shake animation
+                    const form = document.querySelector('.login-box');
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+                    
+                    // Focus password
+                    document.getElementById('password').select();
+                    
+                    // Log failed attempt
+                    if (typeof AuditSystem !== 'undefined') {
+                        AuditSystem.log('LOGIN_FAILED', { username, reason: loginResult.message });
+                    }
+                    
+                    showToast('❌ Login gagal! Periksa kembali kredensial Anda', 'error');
                 }
+            }, 1000);
+        });
 
-                // Show success message
-                const successDiv = document.createElement('div');
-                successDiv.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-2 z-50';
-                successDiv.innerHTML = '<span class="material-icons">check_circle</span><span>Login berhasil! Redirecting...</span>';
-                document.body.appendChild(successDiv);
-
-                // Redirect to dashboard
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else {
-                showError(loginResult.message);
-                
-                // Shake animation on error
-                const form = document.querySelector('.login-box');
-                form.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    form.style.animation = '';
-                }, 500);
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Enter = Submit
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').requestSubmit();
+            }
+            
+            // Alt + U = Focus username
+            if (e.altKey && e.key === 'u') {
+                e.preventDefault();
+                document.getElementById('username').focus();
+            }
+            
+            // Alt + P = Toggle password visibility
+            if (e.altKey && e.key === 'p') {
+                e.preventDefault();
+                togglePassword();
             }
         });
-    </script>
 
-    <style>
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-    </style>
+        // Input focus effects
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.classList.add('input-focus');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.classList.remove('input-focus');
+            });
+        });
+
+        // Auto-dismiss error on typing
+        ['username', 'password'].forEach(id => {
+            document.getElementById(id).addEventListener('input', hideError);
+        });
+    </script>
 </body>
 </html>
