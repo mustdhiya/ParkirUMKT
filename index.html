@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#15803d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Sistem Parkir FST UMKT - Dashboard Monitoring Real-time">
+    
+    <title>Dashboard Monitoring - Parkir FST UMKT</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+        .capacity-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-green-700 to-green-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons text-4xl">local_parking</span>
+                        <div>
+                            <h1 class="text-2xl font-bold">Sistem Parkir FST UMKT</h1>
+                            <p class="text-sm text-green-100">Dashboard Monitoring Real-time</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p class="text-sm font-semibold" id="currentTime"></p>
+                            <p class="text-xs text-green-100" id="sessionInfo">Live Monitoring</p>
+                        </div>
+                        <button onclick="openSettings()" class="p-2 hover:bg-green-600 rounded-lg transition">
+                            <span class="material-icons">settings</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mx-auto px-4 py-6">
+            <!-- Capacity Indicator Banner -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6 animate-fade-in">
+                <div class="flex items-center justify-between flex-wrap gap-6">
+                    <div class="flex items-center space-x-6">
+                        <div class="relative">
+                            <svg class="transform -rotate-90" width="120" height="120">
+                                <circle cx="60" cy="60" r="52" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+                                <circle id="capacityCircle" cx="60" cy="60" r="52" stroke="#15803d" stroke-width="12" fill="none" 
+                                    stroke-linecap="round" class="capacity-circle"
+                                    stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-3xl font-bold text-gray-800" id="capacityPercent">0%</p>
+                                    <p class="text-xs text-gray-500">Terisi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">
+                                <span id="currentCapacity">0</span> / <span id="maxCapacity">100</span>
+                            </h2>
+                            <p class="text-gray-600">Slot Parkir Tersedia</p>
+                            <div class="mt-2">
+                                <div id="capacityStatus" class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 text-green-800">
+                                    <span class="material-icons text-sm">check_circle</span>
+                                    <span class="text-sm font-semibold">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <a href="inDiv.html" class="flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition shadow-md">
+                            <span class="material-icons">login</span>
+                            <span class="font-semibold">Kendaraan Masuk</span>
+                        </a>
+                        <a href="outDiv.html" class="flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition shadow-md">
+                            <span class="material-icons">logout</span>
+                            <span class="font-semibold">Kendaraan Keluar</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.1s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total Parkir</p>
+                            <p class="text-3xl font-bold text-gray-800 mt-2" id="totalParked">0</p>
+                            <p class="text-xs text-gray-400 mt-1">Kendaraan aktif</p>
+                        </div>
+                        <div class="bg-blue-100 p-4 rounded-full">
+                            <span class="material-icons text-4xl text-blue-600">directions_car</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.2s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Mahasiswa</p>
+                            <p class="text-3xl font-bold text-green-600 mt-2" id="totalMhs">0</p>
+                            <p class="text-xs text-gray-400 mt-1">Gratis parkir</p>
+                        </div>
+                        <div class="bg-green-100 p-4 rounded-full">
+                            <span class="material-icons text-4xl text-green-600">school</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.3s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Staff</p>
+                            <p class="text-3xl font-bold text-purple-600 mt-2" id="totalStaff">0</p>
+                            <p class="text-xs text-gray-400 mt-1">Gratis parkir</p>
+                        </div>
+                        <div class="bg-purple-100 p-4 rounded-full">
+                            <span class="material-icons text-4xl text-purple-600">badge</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 stat-card animate-fade-in-up" style="animation-delay: 0.4s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Tamu & Kantin</p>
+                            <p class="text-3xl font-bold text-orange-600 mt-2" id="totalOther">0</p>
+                            <p class="text-xs text-gray-400 mt-1">Mix gratis/berbayar</p>
+                        </div>
+                        <div class="bg-orange-100 p-4 rounded-full">
+                            <span class="material-icons text-4xl text-orange-600">people</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- Parking Table -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md animate-fade-in-up" style="animation-delay: 0.5s">
+                        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-gray-700">list</span>
+                                <h2 class="text-lg font-semibold text-gray-800">Kendaraan Parkir Saat Ini</h2>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="refreshData()" class="flex items-center space-x-1 text-green-600 hover:text-green-700 px-3 py-1 rounded-lg hover:bg-green-50 transition">
+                                    <span class="material-icons text-sm">refresh</span>
+                                    <span class="text-sm font-medium">Refresh</span>
+                                </button>
+                                <select id="filterCategory" onchange="filterVehicles()" class="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="ALL">Semua Kategori</option>
+                                    <option value="MAHASISWA">Mahasiswa</option>
+                                    <option value="STAFF">Staff</option>
+                                    <option value="KANTIN">Kantin</option>
+                                    <option value="TAMU">Tamu</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
+                            <table class="w-full table-hover">
+                                <thead class="bg-gray-50 sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Masuk</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID/NIM</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plat Nomor</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durasi</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gate</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="parkingTableBody" class="divide-y divide-gray-200 bg-white">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Info -->
+                <div class="space-y-4">
+                    <!-- Daily Statistics -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.6s">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="material-icons text-gray-700">today</span>
+                            <h3 class="text-lg font-semibold text-gray-800">Statistik Hari Ini</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center pb-3 border-b">
+                                <span class="text-gray-600 text-sm">Total Masuk</span>
+                                <span class="font-semibold text-green-600 text-lg" id="todayIn">0</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-3 border-b">
+                                <span class="text-gray-600 text-sm">Total Keluar</span>
+                                <span class="font-semibold text-red-600 text-lg" id="todayOut">0</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-3 border-b">
+                                <span class="text-gray-600 text-sm">Rata-rata Durasi</span>
+                                <span class="font-semibold text-gray-800 text-lg" id="avgDuration">0 menit</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Peak Hour</span>
+                                <span class="font-semibold text-gray-800" id="peakHour">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overstay Alerts -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.7s">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="material-icons text-orange-600">warning</span>
+                            <h3 class="text-lg font-semibold text-gray-800">Peringatan Overstay</h3>
+                        </div>
+                        <div id="overstayList" class="space-y-2">
+                            <p class="text-sm text-gray-500 text-center py-4">Tidak ada kendaraan overstay</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.8s">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="material-icons text-gray-700">bolt</span>
+                            <h3 class="text-lg font-semibold text-gray-800">Aksi Cepat</h3>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="report.html" class="flex items-center justify-between w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+                                <span class="text-sm">Laporan</span>
+                                <span class="material-icons text-sm">arrow_forward</span>
+                            </a>
+                            <a href="settings.html" class="flex items-center justify-between w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition">
+                                <span class="text-sm">Pengaturan</span>
+                                <span class="material-icons text-sm">arrow_forward</span>
+                            </a>
+                            <button onclick="exportCurrentData()" class="flex items-center justify-between w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                                <span class="text-sm">Export Data</span>
+                                <span class="material-icons text-sm">download</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-fade-in-up" style="animation-delay: 0.9s">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <span class="material-icons text-gray-700">history</span>
+                            <h3 class="text-lg font-semibold text-gray-800">Aktivitas Terakhir</h3>
+                        </div>
+                        <div id="recentActivity" class="space-y-2 max-h-64 overflow-y-auto">
+                            <!-- Activity logs will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sync.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/audit.js"></script>
+    <script src="js/printer.js"></script>
+    <script src="js/cameraScan.js"></script>
+    
+    <script>
+        // Initialize session
+        function initSession() {
+            const session = AuditSystem.getCurrentSession();
+            if (session.isAuthenticated) {
+                document.getElementById('sessionInfo').textContent = `${session.user} - ${session.gate}`;
+            }
+        }
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString('id-ID', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // Calculate duration
+        function calculateDuration(timeIn) {
+            const now = new Date();
+            const diff = now - new Date(timeIn);
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            if (hours > 0) {
+                return `${hours}j ${minutes % 60}m`;
+            }
+            return `${minutes}m`;
+        }
+
+        // Get category badge
+        function getCategoryBadge(category) {
+            const badges = {
+                'MAHASISWA': '<span class="badge badge-success"><span class="material-icons md-18">school</span>Mahasiswa</span>',
+                'STAFF': '<span class="badge badge-purple"><span class="material-icons md-18">badge</span>Staff</span>',
+                'KANTIN': '<span class="badge badge-warning"><span class="material-icons md-18">restaurant</span>Kantin</span>',
+                'TAMU': '<span class="badge badge-info"><span class="material-icons md-18">person</span>Tamu</span>'
+            };
+            return badges[category] || category;
+        }
+
+        // Update capacity indicator
+        function updateCapacityIndicator() {
+            const config = ParkingSystem.getConfig();
+            const stats = ParkingSystem.getStatistics();
+            const current = stats.total;
+            const max = config.maxCapacity;
+            const percent = Math.round((current / max) * 100);
+            
+            document.getElementById('currentCapacity').textContent = current;
+            document.getElementById('maxCapacity').textContent = max;
+            document.getElementById('capacityPercent').textContent = percent + '%';
+            
+            // Update circle
+            const circle = document.getElementById('capacityCircle');
+            const circumference = 2 * Math.PI * 52;
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            
+            // Update status
+            const statusDiv = document.getElementById('capacityStatus');
+            let statusHtml = '';
+            
+            if (percent >= 90) {
+                circle.style.stroke = '#dc2626';
+                statusHtml = '<span class="material-icons text-sm">error</span><span class="text-sm font-semibold">Hampir Penuh</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100 text-red-800 animate-pulse';
+            } else if (percent >= 70) {
+                circle.style.stroke = '#f59e0b';
+                statusHtml = '<span class="material-icons text-sm">warning</span><span class="text-sm font-semibold">Perhatian</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800';
+            } else {
+                circle.style.stroke = '#15803d';
+                statusHtml = '<span class="material-icons text-sm">check_circle</span><span class="text-sm font-semibold">Normal</span>';
+                statusDiv.className = 'inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-green-100 text-green-800';
+            }
+            
+            statusDiv.innerHTML = statusHtml;
+        }
+
+        // Check overstay vehicles
+        function checkOverstayVehicles() {
+            const overstay = ValidationRules.checkOverstay();
+            const overstayList = document.getElementById('overstayList');
+            
+            if (overstay.length === 0) {
+                overstayList.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada kendaraan overstay</p>';
+                return;
+            }
+            
+            let html = '';
+            overstay.forEach(v => {
+                const duration = calculateDuration(v.timeIn);
+                html += `
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-sm text-gray-800">${v.plate}</span>
+                            ${getCategoryBadge(v.category)}
+                        </div>
+                        <p class="text-xs text-gray-600">Durasi: ${duration}</p>
+                    </div>
+                `;
+            });
+            
+            overstayList.innerHTML = html;
+        }
+
+        // Update recent activity
+        function updateRecentActivity() {
+            const logs = AuditSystem.getTodayLogs().slice(-5).reverse();
+            const activityDiv = document.getElementById('recentActivity');
+            
+            if (logs.length === 0) {
+                activityDiv.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada aktivitas</p>';
+                return;
+            }
+            
+            let html = '';
+            logs.forEach(log => {
+                const time = new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                let icon = 'info';
+                let bgColor = 'bg-gray-50';
+                
+                if (log.action === 'VEHICLE_IN') {
+                    icon = 'login';
+                    bgColor = 'bg-green-50';
+                } else if (log.action === 'VEHICLE_OUT') {
+                    icon = 'logout';
+                    bgColor = 'bg-red-50';
+                }
+                
+                html += `
+                    <div class="${bgColor} border border-gray-200 rounded-lg p-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="material-icons text-sm text-gray-600">${icon}</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-gray-800 truncate">${log.action.replace(/_/g, ' ')}</p>
+                                <p class="text-xs text-gray-500">${time} - ${log.user}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            activityDiv.innerHTML = html;
+        }
+
+        // Filter vehicles
+        function filterVehicles() {
+            const filter = document.getElementById('filterCategory').value;
+            refreshData(filter);
+        }
+
+        // Refresh data
+        function refreshData(filter = 'ALL') {
+            let parked = ParkingSystem.getParkedVehicles();
+            
+            if (filter !== 'ALL') {
+                parked = parked.filter(v => v.category === filter);
+            }
+            
+            const stats = ParkingSystem.getStatistics();
+
+            document.getElementById('totalParked').textContent = stats.total;
+            document.getElementById('totalMhs').textContent = stats.mahasiswa;
+            document.getElementById('totalStaff').textContent = stats.staff;
+            document.getElementById('totalOther').textContent = stats.kantin + stats.tamu;
+
+            const tbody = document.getElementById('parkingTableBody');
+            tbody.innerHTML = '';
+
+            if (parked.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center">
+                            <span class="material-icons text-5xl text-gray-400">inbox</span>
+                            <p class="mt-2 text-gray-500">Tidak ada kendaraan parkir</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            parked.forEach(vehicle => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-900">${new Date(vehicle.timeIn).toLocaleTimeString('id-ID')}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">${vehicle.identifier}</td>
+                    <td class="px-6 py-4 text-sm">${getCategoryBadge(vehicle.category)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 font-semibold">${vehicle.plate}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${calculateDuration(vehicle.timeIn)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${vehicle.gate || '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update daily statistics
+            const history = ParkingSystem.getTodayHistory();
+            document.getElementById('todayIn').textContent = history.in;
+            document.getElementById('todayOut').textContent = history.out;
+            document.getElementById('avgDuration').textContent = history.avgDuration + ' menit';
+
+            // Update capacity
+            updateCapacityIndicator();
+            
+            // Check overstay
+            checkOverstayVehicles();
+            
+            // Update activity
+            updateRecentActivity();
+        }
+
+        // Export current data
+        function exportCurrentData() {
+            const vehicles = ParkingSystem.getParkedVehicles();
+            const stats = ParkingSystem.getStatistics();
+            const config = ParkingSystem.getConfig();
+            
+            let csv = 'ID,Plat,Kategori,Identifier,Waktu Masuk,Durasi (menit),Gate,Operator\n';
+            
+            vehicles.forEach(v => {
+                const duration = Math.floor((Date.now() - new Date(v.timeIn)) / 60000);
+                csv += `${v.id},"${v.plate}",${v.category},"${v.identifier}","${v.timeIn}",${duration},"${v.gate || '-'}","${v.operator || '-'}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `parkir-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            AuditSystem.log('DATA_EXPORT', { count: vehicles.length });
+        }
+
+        // Open settings
+        function openSettings() {
+            window.location.href = 'settings.html';
+        }
+
+        // Setup sync listener
+        SyncSystem.addListener('storage_updated', function(data) {
+            refreshData();
+        });
+
+        // Initialize
+        initSession();
+        updateTime();
+        setInterval(updateTime, 1000);
+        setInterval(refreshData, 3000);
+        refreshData();
+
+        // Log page view
+        AuditSystem.log('PAGE_VIEW', { page: 'dashboard' });
+    </script>
+</body>
+</html>

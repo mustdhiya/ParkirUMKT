@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#b91c1c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Kendaraan Keluar - Sistem Parkir FST UMKT">
+    
+    <title>Kendaraan Keluar - Parkir FST UMKT</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-red-700 to-red-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="material-icons text-3xl hover:text-red-200 transition">arrow_back</a>
+                        <div>
+                            <h1 class="text-xl font-bold">Kendaraan Keluar</h1>
+                            <p class="text-sm text-red-100">Scan atau Cari Kendaraan</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-semibold" id="sessionInfo">-</p>
+                            <p class="text-xs text-red-100" id="currentTime"></p>
+                        </div>
+                        <span class="material-icons text-4xl">logout</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mx-auto px-4 py-6 max-w-6xl">
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Scanner Section -->
+                <div class="bg-white rounded-lg shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.1s">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="material-icons text-red-600">qr_code_scanner</span>
+                        <h2 class="text-lg font-semibold text-gray-800">Scan Barcode/QR Code</h2>
+                    </div>
+                    
+                    <div id="reader" class="w-full rounded-lg overflow-hidden mb-4 scanner-container"></div>
+                    
+                    <button onclick="toggleScanner()" id="scanBtn" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg transition flex items-center justify-center space-x-2 shadow-md">
+                        <span class="material-icons">camera_alt</span>
+                        <span class="font-semibold">Aktifkan Scanner</span>
+                    </button>
+
+                    <!-- Scanner Stats -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-red-600" id="todayExits">0</p>
+                                <p class="text-xs text-gray-500">Keluar Hari Ini</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-green-600" id="totalRevenue">Rp 0</p>
+                                <p class="text-xs text-gray-500">Pendapatan Hari Ini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Section -->
+                <div class="bg-white rounded-lg shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.2s">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="material-icons text-blue-600">search</span>
+                        <h2 class="text-lg font-semibold text-gray-800">Cari Kendaraan</h2>
+                    </div>
+
+                    <form id="searchForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                <span class="material-icons text-sm">tune</span>
+                                <span>Cari Berdasarkan</span>
+                            </label>
+                            <select id="searchType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                                <option value="PLATE">Plat Nomor</option>
+                                <option value="IDENTIFIER">ID/NIM/Kode</option>
+                                <option value="TICKET_ID">ID Tiket</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                <span class="material-icons text-sm" id="searchIcon">confirmation_number</span>
+                                <span id="searchLabel">Plat Nomor</span>
+                            </label>
+                            <input type="text" id="searchInput" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent uppercase transition" placeholder="KT 1234 AB">
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg transition flex items-center justify-center space-x-2 shadow-md font-semibold text-lg">
+                            <span class="material-icons">search</span>
+                            <span>Cari Kendaraan</span>
+                        </button>
+                    </form>
+
+                    <div id="searchResult" class="mt-6 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Vehicle Info Card -->
+            <div id="vehicleInfo" class="bg-white rounded-lg shadow-lg p-6 mt-6 hidden animate-fade-in-up">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-gray-700">info</span>
+                        <h3 class="text-lg font-semibold text-gray-800">Informasi Kendaraan</h3>
+                    </div>
+                    <button onclick="clearVehicleInfo()" class="text-gray-500 hover:text-gray-700">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="text-sm text-gray-500 mb-1">Kategori</p>
+                                <p class="text-lg font-semibold" id="infoCategory"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="text-sm text-gray-500 mb-1">ID/NIM</p>
+                                <p class="text-lg font-semibold" id="infoIdentifier"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="text-sm text-gray-500 mb-1">Plat Nomor</p>
+                                <p class="text-lg font-semibold" id="infoPlate"></p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="text-sm text-gray-500 mb-1">Gate Masuk</p>
+                                <p class="text-lg font-semibold" id="infoGate"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                                <p class="text-sm text-blue-600 mb-1">Waktu Masuk</p>
+                                <p class="text-lg font-semibold text-blue-800" id="infoTimeIn"></p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
+                                <p class="text-sm text-green-600 mb-1">Durasi Parkir</p>
+                                <p class="text-lg font-semibold text-green-800" id="infoDuration"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center items-center bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border-2 border-red-200">
+                        <p class="text-sm text-gray-600 mb-2">Total Biaya</p>
+                        <p class="text-4xl font-bold text-red-600" id="infoFee">Rp 0</p>
+                        <p class="text-xs text-gray-500 mt-2" id="feeNote">-</p>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-200">
+                    <button onclick="confirmExit()" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg transition flex items-center justify-center space-x-2 text-lg font-semibold shadow-md">
+                        <span class="material-icons">check_circle</span>
+                        <span>Konfirmasi Kendaraan Keluar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Exits -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mt-6 animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-gray-700">history</span>
+                        <h3 class="text-lg font-semibold text-gray-800">Kendaraan Keluar Terakhir</h3>
+                    </div>
+                    <button onclick="refreshRecentExits()" class="text-red-600 hover:text-red-700">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                </div>
+                <div id="recentExits" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Recent exits will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sync.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/audit.js"></script>
+    <script src="js/printer.js"></script>
+    <script src="js/cameraScan.js"></script>
+    
+    <script>
+        let html5QrCode;
+        let isScanning = false;
+        let currentVehicle = null;
+
+        // Initialize session
+        function initSession() {
+            const session = AuditSystem.getCurrentSession();
+            if (session.isAuthenticated) {
+                document.getElementById('sessionInfo').textContent = `${session.user} - ${session.gate}`;
+            } else {
+                document.getElementById('sessionInfo').textContent = 'Guest Mode';
+            }
+        }
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('id-ID');
+        }
+
+        // Update stats
+        function updateStats() {
+            const history = ParkingSystem.getTodayHistory();
+            document.getElementById('todayExits').textContent = history.out;
+            
+            // Calculate revenue
+            const exitLogs = AuditSystem.getLogsByAction('VEHICLE_OUT');
+            const todayExits = exitLogs.filter(log => {
+                const logDate = new Date(log.timestamp).toDateString();
+                return logDate === new Date().toDateString();
+            });
+            
+            let revenue = 0;
+            todayExits.forEach(log => {
+                if (log.data.fee) {
+                    revenue += log.data.fee;
+                }
+            });
+            
+            document.getElementById('totalRevenue').textContent = `Rp ${revenue.toLocaleString('id-ID')}`;
+        }
+
+        // Search type change handler
+        document.getElementById('searchType').addEventListener('change', function() {
+            const searchLabel = document.getElementById('searchLabel');
+            const searchInput = document.getElementById('searchInput');
+            const searchIcon = document.getElementById('searchIcon');
+            
+            switch(this.value) {
+                case 'PLATE':
+                    searchLabel.textContent = 'Plat Nomor';
+                    searchInput.placeholder = 'KT 1234 AB';
+                    searchIcon.textContent = 'confirmation_number';
+                    searchInput.classList.add('uppercase');
+                    break;
+                case 'IDENTIFIER':
+                    searchLabel.textContent = 'ID/NIM/Kode';
+                    searchInput.placeholder = 'Contoh: 2101010001234 atau RFIDS00123';
+                    searchIcon.textContent = 'badge';
+                    searchInput.classList.remove('uppercase');
+                    break;
+                case 'TICKET_ID':
+                    searchLabel.textContent = 'ID Tiket';
+                    searchInput.placeholder = 'Contoh: PKR1234567890';
+                    searchIcon.textContent = 'receipt_long';
+                    searchInput.classList.remove('uppercase');
+                    break;
+            }
+            searchInput.value = '';
+            searchInput.focus();
+        });
+
+        // Scanner functions
+        function toggleScanner() {
+            if (!isScanning) {
+                startScanner();
+            } else {
+                stopScanner();
+            }
+        }
+
+        function startScanner() {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                document.getElementById('scanBtn').innerHTML = '<span class="material-icons">stop</span><span class="font-semibold">Hentikan Scanner</span>';
+                document.getElementById('scanBtn').classList.remove('bg-red-600', 'hover:bg-red-700');
+                document.getElementById('scanBtn').classList.add('bg-gray-600', 'hover:bg-gray-700');
+            }).catch(err => {
+                showNotification('Gagal mengakses kamera: ' + err, 'error');
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    document.getElementById('scanBtn').innerHTML = '<span class="material-icons">camera_alt</span><span class="font-semibold">Aktifkan Scanner</span>';
+                    document.getElementById('scanBtn').classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                    document.getElementById('scanBtn').classList.add('bg-red-600', 'hover:bg-red-700');
+                });
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            stopScanner();
+            
+            // Try to parse as barcode first
+            const result = ParkingSystem.parseBarcode(decodedText);
+            
+            if (result.identifier) {
+                searchByIdentifier(result.identifier);
+            } else {
+                // Try as ticket ID
+                searchByTicketId(decodedText);
+            }
+        }
+
+        function onScanError(error) {
+            // Silent error handling
+        }
+
+        // Search functions
+        function searchByIdentifier(identifier) {
+            const vehicle = ParkingSystem.findVehicleByIdentifier(identifier);
+            if (vehicle) {
+                displayVehicleInfo(vehicle);
+            } else {
+                showNotFound('ID/NIM', identifier);
+            }
+        }
+
+        function searchByPlate(plate) {
+            const vehicle = ParkingSystem.findVehicleByPlate(plate);
+            if (vehicle) {
+                displayVehicleInfo(vehicle);
+            } else {
+                showNotFound('Plat nomor', plate);
+            }
+        }
+
+        function searchByTicketId(ticketId) {
+            const vehicles = ParkingSystem.getParkedVehicles();
+            const vehicle = vehicles.find(v => v.id === ticketId);
+            if (vehicle) {
+                displayVehicleInfo(vehicle);
+            } else {
+                showNotFound('ID Tiket', ticketId);
+            }
+        }
+
+        function showNotFound(type, value) {
+            document.getElementById('searchResult').innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 animate-fade-in">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-red-600">error</span>
+                        <span class="font-semibold text-red-800">Kendaraan tidak ditemukan</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mt-2">${type} "${value}" tidak ada dalam sistem</p>
+                </div>
+            `;
+            document.getElementById('searchResult').classList.remove('hidden');
+            document.getElementById('vehicleInfo').classList.add('hidden');
+        }
+
+        // Form submission
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const searchType = document.getElementById('searchType').value;
+            const searchValue = document.getElementById('searchInput').value.trim();
+            
+            if (!searchValue) {
+                showNotification('Masukkan data pencarian', 'error');
+                return;
+            }
+
+            switch(searchType) {
+                case 'PLATE':
+                    searchByPlate(searchValue.toUpperCase());
+                    break;
+                case 'IDENTIFIER':
+                    searchByIdentifier(searchValue);
+                    break;
+                case 'TICKET_ID':
+                    searchByTicketId(searchValue);
+                    break;
+            }
+        });
+
+        // Display vehicle info
+        function displayVehicleInfo(vehicle) {
+            currentVehicle = vehicle;
+            const duration = calculateDuration(vehicle.timeIn);
+            const fee = ParkingSystem.calculateFee(vehicle);
+
+            document.getElementById('infoCategory').textContent = vehicle.category;
+            document.getElementById('infoIdentifier').textContent = vehicle.identifier;
+            document.getElementById('infoPlate').textContent = vehicle.plate;
+            document.getElementById('infoGate').textContent = vehicle.gate || 'MAIN';
+            document.getElementById('infoTimeIn').textContent = new Date(vehicle.timeIn).toLocaleString('id-ID');
+            document.getElementById('infoDuration').textContent = duration.text;
+            document.getElementById('infoFee').textContent = fee.text;
+            document.getElementById('feeNote').textContent = fee.amount === 0 ? 'Gratis Parkir' : `${fee.amount / 2000} jam`;
+
+            document.getElementById('vehicleInfo').classList.remove('hidden');
+            document.getElementById('searchResult').classList.add('hidden');
+
+            document.getElementById('vehicleInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Calculate duration
+        function calculateDuration(timeIn) {
+            const now = new Date();
+            const diff = now - new Date(timeIn);
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            
+            return {
+                minutes: minutes,
+                text: hours > 0 ? `${hours} jam ${minutes % 60} menit` : `${minutes} menit`
+            };
+        }
+
+        // Clear vehicle info
+        function clearVehicleInfo() {
+            document.getElementById('vehicleInfo').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+            currentVehicle = null;
+            document.getElementById('searchInput').focus();
+        }
+
+        // Confirm exit
+        function confirmExit() {
+            if (!currentVehicle) return;
+
+            if (confirm(`Konfirmasi kendaraan ${currentVehicle.plate} keluar?`)) {
+                const result = ParkingSystem.vehicleOut(currentVehicle.plate);
+                
+                if (result.success) {
+                    // Print exit receipt
+                    TicketPrinter.printExitReceipt(result.vehicle, result.duration, result.fee);
+                    
+                    showNotification('Kendaraan berhasil keluar!', 'success');
+                    
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('vehicleInfo').classList.add('hidden');
+                    document.getElementById('searchResult').classList.add('hidden');
+                    currentVehicle = null;
+
+                    updateStats();
+                    refreshRecentExits();
+                    
+                    document.getElementById('searchInput').focus();
+                } else {
+                    showNotification('Gagal mengeluarkan kendaraan: ' + result.message, 'error');
+                }
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `toast-notification ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-2`;
+            notification.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span><span>${message}</span>`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('toast-exit');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Refresh recent exits
+        function refreshRecentExits() {
+            const logs = AuditSystem.getLogsByAction('VEHICLE_OUT').slice(-5).reverse();
+            const exitsDiv = document.getElementById('recentExits');
+            
+            if (logs.length === 0) {
+                exitsDiv.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada kendaraan keluar</p>';
+                return;
+            }
+            
+            let html = '';
+            logs.forEach(log => {
+                const time = new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const data = log.data;
+                const fee = data.fee || 0;
+                html += `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-sm text-gray-800">${data.plate}</span>
+                            <span class="text-sm font-bold ${fee > 0 ? 'text-green-600' : 'text-gray-500'}">${fee > 0 ? 'Rp ' + fee.toLocaleString('id-ID') : 'Gratis'}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-600">Durasi: ${Math.floor(data.duration / 60)} jam ${data.duration % 60} menit</span>
+                            <span class="text-xs text-gray-500">${time}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            exitsDiv.innerHTML = html;
+        }
+
+        // Initialize
+        initSession();
+        updateTime();
+        setInterval(updateTime, 1000);
+        updateStats();
+        refreshRecentExits();
+
+        // Log page view
+        AuditSystem.log('PAGE_VIEW', { page: 'vehicle_exit' });
+    </script>
+</body>
+</html>

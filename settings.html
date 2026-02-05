@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Sistem - Parkir FST UMKT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-button.active { 
+            border-bottom: 3px solid #16a34a; 
+            color: #16a34a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <header class="bg-green-700 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="material-icons text-3xl hover:text-green-200">arrow_back</a>
+                        <div>
+                            <h1 class="text-xl font-bold">Pengaturan Sistem</h1>
+                            <p class="text-sm text-green-100">Konfigurasi Parkir FST UMKT</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-4xl">settings</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mx-auto px-4 py-6 max-w-6xl">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="border-b border-gray-200">
+                    <nav class="flex overflow-x-auto">
+                        <button onclick="switchTab('general')" class="tab-button active flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">tune</span>
+                            <span>Umum</span>
+                        </button>
+                        <button onclick="switchTab('capacity')" class="tab-button flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">format_list_numbered</span>
+                            <span>Kapasitas</span>
+                        </button>
+                        <button onclick="switchTab('tariff')" class="tab-button flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">payments</span>
+                            <span>Tarif</span>
+                        </button>
+                        <button onclick="switchTab('rules')" class="tab-button flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">rule</span>
+                            <span>Aturan</span>
+                        </button>
+                        <button onclick="switchTab('gates')" class="tab-button flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">location_on</span>
+                            <span>Gate</span>
+                        </button>
+                        <button onclick="switchTab('reserved')" class="tab-button flex items-center space-x-2 px-6 py-4 text-gray-600 hover:text-green-600 transition whitespace-nowrap">
+                            <span class="material-icons text-sm">bookmark</span>
+                            <span>Reserved</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="p-6">
+                    <!-- TAB: UMUM -->
+                    <div id="tab-general" class="tab-content active">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <span class="material-icons text-green-600">tune</span>
+                            <h2 class="text-xl font-semibold text-gray-800">Pengaturan Umum</h2>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lokasi Parkir</label>
+                                    <input type="text" id="locationName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="Parkir FST UMKT">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                                    <input type="text" id="address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="Jl. Ir. H. Juanda No.15, Samarinda">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Jam Operasional Mulai</label>
+                                    <input type="time" id="openTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="06:00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Jam Operasional Tutup</label>
+                                    <input type="time" id="closeTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="22:00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Kontak Pengelola</label>
+                                    <input type="text" id="contactPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="+62 812-3456-7890">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" id="contactEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="parkir@umkt.ac.id">
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-6">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="autoRefresh" class="w-5 h-5 text-green-600 rounded focus:ring-green-500">
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Auto Refresh Dashboard</span>
+                                        <p class="text-sm text-gray-500">Update otomatis setiap 3 detik</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="printTicket" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Cetak Karcis Otomatis</span>
+                                        <p class="text-sm text-gray-500">Print karcis saat kendaraan masuk</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="soundNotif" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Notifikasi Suara</span>
+                                        <p class="text-sm text-gray-500">Bunyi saat scan berhasil/gagal</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: KAPASITAS -->
+                    <div id="tab-capacity" class="tab-content">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <span class="material-icons text-green-600">format_list_numbered</span>
+                            <h2 class="text-xl font-semibold text-gray-800">Pengaturan Kapasitas</h2>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start space-x-2">
+                                    <span class="material-icons text-blue-600">info</span>
+                                    <div>
+                                        <p class="text-sm text-blue-800 font-medium">Informasi Kapasitas</p>
+                                        <p class="text-sm text-blue-700 mt-1">Tentukan jumlah maksimal kendaraan yang dapat parkir di setiap area</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">directions_car</span>
+                                        <h3 class="font-semibold text-gray-800">Kapasitas Motor</h3>
+                                    </div>
+                                    <input type="number" id="capacityMotor" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="150" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Jumlah slot parkir motor</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">local_shipping</span>
+                                        <h3 class="font-semibold text-gray-800">Kapasitas Mobil</h3>
+                                    </div>
+                                    <input type="number" id="capacityCar" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="50" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Jumlah slot parkir mobil</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">school</span>
+                                        <h3 class="font-semibold text-gray-800">Reserved Mahasiswa</h3>
+                                    </div>
+                                    <input type="number" id="reservedMahasiswa" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="100" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Slot khusus mahasiswa</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">badge</span>
+                                        <h3 class="font-semibold text-gray-800">Reserved Staff</h3>
+                                    </div>
+                                    <input type="number" id="reservedStaff" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="50" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Slot khusus staff/dosen</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">person</span>
+                                        <h3 class="font-semibold text-gray-800">Reserved Tamu</h3>
+                                    </div>
+                                    <input type="number" id="reservedTamu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="20" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Slot khusus tamu</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <span class="material-icons text-gray-600">restaurant</span>
+                                        <h3 class="font-semibold text-gray-800">Reserved Kantin</h3>
+                                    </div>
+                                    <input type="number" id="reservedKantin" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="10" min="0">
+                                    <p class="text-xs text-gray-500 mt-2">Slot khusus vendor kantin</p>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-6">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="enforceCapacity" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Aktifkan Pembatasan Kapasitas</span>
+                                        <p class="text-sm text-gray-500">Tolak kendaraan baru jika kapasitas penuh</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="showCapacityWarning" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Peringatan Kapasitas</span>
+                                        <p class="text-sm text-gray-500">Tampilkan notifikasi saat kapasitas >80%</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: TARIF -->
+                    <div id="tab-tariff" class="tab-content">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <span class="material-icons text-green-600">payments</span>
+                            <h2 class="text-xl font-semibold text-gray-800">Pengaturan Tarif</h2>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="flex items-start space-x-2">
+                                    <span class="material-icons text-yellow-600">warning</span>
+                                    <div>
+                                        <p class="text-sm text-yellow-800 font-medium">Catatan Tarif</p>
+                                        <p class="text-sm text-yellow-700 mt-1">Tarif hanya berlaku untuk tamu umum. Staff, mahasiswa, dan kantin gratis.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Tarif Motor</h3>
+                                            <p class="text-sm text-gray-500">Per jam</p>
+                                        </div>
+                                        <span class="material-icons text-gray-400">two_wheeler</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-gray-700">Rp</span>
+                                        <input type="number" id="tariffMotor" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="2000" step="500">
+                                        <span class="text-gray-500">/jam</span>
+                                    </div>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Tarif Mobil</h3>
+                                            <p class="text-sm text-gray-500">Per jam</p>
+                                        </div>
+                                        <span class="material-icons text-gray-400">directions_car</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-gray-700">Rp</span>
+                                        <input type="number" id="tariffCar" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="5000" step="500">
+                                        <span class="text-gray-500">/jam</span>
+                                    </div>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-800">Tarif Maksimal Harian</h3>
+                                            <p class="text-sm text-gray-500">Maksimal biaya per hari</p>
+                                        </div>
+                                        <span class="material-icons text-gray-400">event</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-gray-700">Rp</span>
+                                        <input type="number" id="maxDailyFee" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="50000" step="5000">
+                                        <span class="text-gray-500">/hari</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-6">
+                                <h3 class="font-semibold text-gray-800 mb-4">Kategori Gratis</h3>
+                                <div class="space-y-3">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="freeMahasiswa" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked disabled>
+                                        <span class="text-gray-700">Mahasiswa</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="freeStaff" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked disabled>
+                                        <span class="text-gray-700">Staff & Dosen</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="freeKantin" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked disabled>
+                                        <span class="text-gray-700">Kantin</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="freeTamuUndangan" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                        <span class="text-gray-700">Tamu Undangan</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="roundUpHour" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Pembulatan Jam</span>
+                                        <p class="text-sm text-gray-500">Bulatkan ke atas per jam (mis: 1 jam 10 menit = 2 jam)</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: ATURAN -->
+                    <div id="tab-rules" class="tab-content">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <span class="material-icons text-green-600">rule</span>
+                            <h2 class="text-xl font-semibold text-gray-800">Aturan Parkir</h2>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                <div class="flex items-start space-x-2">
+                                    <span class="material-icons text-orange-600">rule</span>
+                                    <div>
+                                        <p class="text-sm text-orange-800 font-medium">Business Rules</p>
+                                        <p class="text-sm text-orange-700 mt-1">Aturan untuk mencegah penyalahgunaan sistem parkir</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Maksimal Kendaraan per Orang</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Mahasiswa</label>
+                                            <input type="number" id="maxVehicleMahasiswa" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="1" min="1" max="5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Staff</label>
+                                            <input type="number" id="maxVehicleStaff" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="2" min="1" max="5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Kantin</label>
+                                            <input type="number" id="maxVehicleKantin" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="1" min="1" max="5">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Tamu</label>
+                                            <input type="number" id="maxVehicleTamu" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="2" min="1" max="5">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">Jumlah maksimal kendaraan yang boleh parkir bersamaan</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Durasi Maksimal Parkir (Jam)</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Mahasiswa</label>
+                                            <input type="number" id="maxDurationMahasiswa" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="12" min="1" max="168">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Staff</label>
+                                            <input type="number" id="maxDurationStaff" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="24" min="1" max="168">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Kantin</label>
+                                            <input type="number" id="maxDurationKantin" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="12" min="1" max="168">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Tamu</label>
+                                            <input type="number" id="maxDurationTamu" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="8" min="1" max="168">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">Setelah batas waktu, akan ada peringatan overstay</p>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <h3 class="font-semibold text-gray-800 mb-4">Peringatan Overstay</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Cek Interval (menit)</label>
+                                            <input type="number" id="overstayCheckInterval" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="30" min="5" step="5">
+                                            <p class="text-xs text-gray-500 mt-1">Seberapa sering cek overstay</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">Denda per Jam (Rp)</label>
+                                            <input type="number" id="overstayFine" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value="5000" step="1000">
+                                            <p class="text-xs text-gray-500 mt-1">Denda untuk kendaraan overstay</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-6 space-y-3">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="enforceMaxVehicle" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Batasi Jumlah Kendaraan</span>
+                                        <p class="text-sm text-gray-500">Tolak jika sudah melebihi maksimal kendaraan per orang</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="enableOverstayAlert" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Aktifkan Peringatan Overstay</span>
+                                        <p class="text-sm text-gray-500">Notifikasi otomatis untuk kendaraan yang melebihi batas</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="blockDuplicatePlate" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" checked>
+                                    <div>
+                                        <span class="text-gray-700 font-medium">Blokir Plat Duplikat</span>
+                                        <p class="text-sm text-gray-500">Cegah plat nomor yang sama masuk 2x</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: GATE -->
+                    <div id="tab-gates" class="tab-content">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-green-600">location_on</span>
+                                <h2 class="text-xl font-semibold text-gray-800">Manajemen Gate</h2>
+                            </div>
+                            <button onclick="addGate()" class="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                                <span class="material-icons text-sm">add</span>
+                                <span>Tambah Gate</span>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4" id="gateList">
+                            <div class="border border-gray-200 rounded-lg p-4" data-gate-id="1">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="material-icons text-green-600">location_on</span>
+                                        <div>
+                                            <input type="text" class="gate-name font-semibold text-gray-800 border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-green-500 focus:outline-none" value="Gate Utara">
+                                            <p class="text-sm text-gray-500">Gate ID: GATE-001</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeGate(1)" class="text-red-600 hover:text-red-700">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Fungsi</label>
+                                        <select class="gate-type w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="IN">Masuk</option>
+                                            <option value="OUT">Keluar</option>
+                                            <option value="BOTH" selected>Masuk & Keluar</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Status</label>
+                                        <select class="gate-status w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="ACTIVE" selected>Aktif</option>
+                                            <option value="INACTIVE">Nonaktif</option>
+                                            <option value="MAINTENANCE">Maintenance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4" data-gate-id="2">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="material-icons text-green-600">location_on</span>
+                                        <div>
+                                            <input type="text" class="gate-name font-semibold text-gray-800 border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-green-500 focus:outline-none" value="Gate Selatan">
+                                            <p class="text-sm text-gray-500">Gate ID: GATE-002</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeGate(2)" class="text-red-600 hover:text-red-700">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Fungsi</label>
+                                        <select class="gate-type w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="IN" selected>Masuk</option>
+                                            <option value="OUT">Keluar</option>
+                                            <option value="BOTH">Masuk & Keluar</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Status</label>
+                                        <select class="gate-status w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="ACTIVE" selected>Aktif</option>
+                                            <option value="INACTIVE">Nonaktif</option>
+                                            <option value="MAINTENANCE">Maintenance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: RESERVED -->
+                    <div id="tab-reserved" class="tab-content">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons text-green-600">bookmark</span>
+                                <h2 class="text-xl font-semibold text-gray-800">Slot Parkir Reserved</h2>
+                            </div>
+                            <button onclick="addReservedSpot()" class="flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
+                                <span class="material-icons text-sm">add</span>
+                                <span>Tambah Slot</span>
+                            </button>
+                        </div>
+
+                        <div class="space-y-4" id="reservedSpotsList">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="bg-purple-100 text-purple-600 px-3 py-1 rounded-lg font-bold">A-01</div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">Dekan FST</p>
+                                            <p class="text-sm text-gray-500">Reserved permanen</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeReservedSpot('A-01')" class="text-red-600 hover:text-red-700">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Kategori</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="DEKAN" selected>Dekan</option>
+                                            <option value="WAKIL_DEKAN">Wakil Dekan</option>
+                                            <option value="DOSEN">Dosen</option>
+                                            <option value="STAFF">Staff</option>
+                                            <option value="VIP">VIP/Tamu Penting</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Plat Nomor</label>
+                                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 uppercase" placeholder="KT 1234 AB">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="bg-purple-100 text-purple-600 px-3 py-1 rounded-lg font-bold">A-02</div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">Wakil Dekan FST</p>
+                                            <p class="text-sm text-gray-500">Reserved permanen</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeReservedSpot('A-02')" class="text-red-600 hover:text-red-700">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Kategori</label>
+                                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                            <option value="DEKAN">Dekan</option>
+                                            <option value="WAKIL_DEKAN" selected>Wakil Dekan</option>
+                                            <option value="DOSEN">Dosen</option>
+                                            <option value="STAFF">Staff</option>
+                                            <option value="VIP">VIP/Tamu Penting</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Plat Nomor</label>
+                                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 uppercase" placeholder="KT 5678 CD">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between mt-6">
+                <button onclick="resetToDefault()" class="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition">
+                    <span class="material-icons">restore</span>
+                    <span>Reset ke Default</span>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportSettings()" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
+                        <span class="material-icons">download</span>
+                        <span>Export</span>
+                    </button>
+                    <button onclick="saveSettings()" class="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition">
+                        <span class="material-icons">save</span>
+                        <span>Simpan Pengaturan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cameraScan.js"></script>
+    <script>
+        const SETTINGS_KEY = 'fst_parking_settings';
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.closest('.tab-button').classList.add('active');
+        }
+
+        function loadSettings() {
+            const savedSettings = localStorage.getItem(SETTINGS_KEY);
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                Object.keys(settings).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = settings[key];
+                        } else {
+                            element.value = settings[key];
+                        }
+                    }
+                });
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                locationName: document.getElementById('locationName').value,
+                address: document.getElementById('address').value,
+                openTime: document.getElementById('openTime').value,
+                closeTime: document.getElementById('closeTime').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                autoRefresh: document.getElementById('autoRefresh').checked,
+                printTicket: document.getElementById('printTicket').checked,
+                soundNotif: document.getElementById('soundNotif').checked,
+                
+                capacityMotor: document.getElementById('capacityMotor').value,
+                capacityCar: document.getElementById('capacityCar').value,
+                reservedMahasiswa: document.getElementById('reservedMahasiswa').value,
+                reservedStaff: document.getElementById('reservedStaff').value,
+                reservedTamu: document.getElementById('reservedTamu').value,
+                reservedKantin: document.getElementById('reservedKantin').value,
+                enforceCapacity: document.getElementById('enforceCapacity').checked,
+                showCapacityWarning: document.getElementById('showCapacityWarning').checked,
+                
+                tariffMotor: document.getElementById('tariffMotor').value,
+                tariffCar: document.getElementById('tariffCar').value,
+                maxDailyFee: document.getElementById('maxDailyFee').value,
+                freeTamuUndangan: document.getElementById('freeTamuUndangan').checked,
+                roundUpHour: document.getElementById('roundUpHour').checked,
+                
+                maxVehicleMahasiswa: document.getElementById('maxVehicleMahasiswa').value,
+                maxVehicleStaff: document.getElementById('maxVehicleStaff').value,
+                maxVehicleKantin: document.getElementById('maxVehicleKantin').value,
+                maxVehicleTamu: document.getElementById('maxVehicleTamu').value,
+                maxDurationMahasiswa: document.getElementById('maxDurationMahasiswa').value,
+                maxDurationStaff: document.getElementById('maxDurationStaff').value,
+                maxDurationKantin: document.getElementById('maxDurationKantin').value,
+                maxDurationTamu: document.getElementById('maxDurationTamu').value,
+                overstayCheckInterval: document.getElementById('overstayCheckInterval').value,
+                overstayFine: document.getElementById('overstayFine').value,
+                enforceMaxVehicle: document.getElementById('enforceMaxVehicle').checked,
+                enableOverstayAlert: document.getElementById('enableOverstayAlert').checked,
+                blockDuplicatePlate: document.getElementById('blockDuplicatePlate').checked
+            };
+
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-2 z-50';
+            notification.innerHTML = '<span class="material-icons">check_circle</span><span>Pengaturan berhasil disimpan!</span>';
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function resetToDefault() {
+            if (confirm('Reset semua pengaturan ke default? Tindakan ini tidak dapat dibatalkan.')) {
+                localStorage.removeItem(SETTINGS_KEY);
+                location.reload();
+            }
+        }
+
+        function exportSettings() {
+            const settings = localStorage.getItem(SETTINGS_KEY);
+            if (!settings) {
+                alert('Tidak ada pengaturan untuk diexport');
+                return;
+            }
+
+            const blob = new Blob([settings], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `parking-settings-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        let gateCounter = 3;
+        function addGate() {
+            const gateList = document.getElementById('gateList');
+            const newGate = document.createElement('div');
+            newGate.className = 'border border-gray-200 rounded-lg p-4';
+            newGate.setAttribute('data-gate-id', gateCounter);
+            newGate.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons text-green-600">location_on</span>
+                        <div>
+                            <input type="text" class="gate-name font-semibold text-gray-800 border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-green-500 focus:outline-none" value="Gate ${gateCounter}">
+                            <p class="text-sm text-gray-500">Gate ID: GATE-00${gateCounter}</p>
+                        </div>
+                    </div>
+                    <button onclick="removeGate(${gateCounter})" class="text-red-600 hover:text-red-700">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Fungsi</label>
+                        <select class="gate-type w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="IN">Masuk</option>
+                            <option value="OUT">Keluar</option>
+                            <option value="BOTH">Masuk & Keluar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Status</label>
+                        <select class="gate-status w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="ACTIVE" selected>Aktif</option>
+                            <option value="INACTIVE">Nonaktif</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            gateList.appendChild(newGate);
+            gateCounter++;
+        }
+
+        function removeGate(id) {
+            if (confirm('Hapus gate ini?')) {
+                const gate = document.querySelector(`[data-gate-id="${id}"]`);
+                if (gate) gate.remove();
+            }
+        }
+
+        let spotCounter = 3;
+        function addReservedSpot() {
+            const spotsList = document.getElementById('reservedSpotsList');
+            const spotCode = `A-${String(spotCounter).padStart(2, '0')}`;
+            const newSpot = document.createElement('div');
+            newSpot.className = 'border border-gray-200 rounded-lg p-4';
+            newSpot.setAttribute('data-spot-code', spotCode);
+            newSpot.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-purple-100 text-purple-600 px-3 py-1 rounded-lg font-bold">${spotCode}</div>
+                        <div>
+                            <input type="text" class="spot-name font-semibold text-gray-800 border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-green-500 focus:outline-none" placeholder="Nama/Jabatan">
+                            <p class="text-sm text-gray-500">Reserved permanen</p>
+                        </div>
+                    </div>
+                    <button onclick="removeReservedSpot('${spotCode}')" class="text-red-600 hover:text-red-700">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Kategori</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="DEKAN">Dekan</option>
+                            <option value="WAKIL_DEKAN">Wakil Dekan</option>
+                            <option value="DOSEN">Dosen</option>
+                            <option value="STAFF">Staff</option>
+                            <option value="VIP">VIP/Tamu Penting</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Plat Nomor</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 uppercase" placeholder="KT 1234 AB">
+                    </div>
+                </div>
+            `;
+            spotsList.appendChild(newSpot);
+            spotCounter++;
+        }
+
+        function removeReservedSpot(code) {
+            if (confirm('Hapus slot reserved ini?')) {
+                const spot = document.querySelector(`[data-spot-code="${code}"]`);
+                if (spot) spot.remove();
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

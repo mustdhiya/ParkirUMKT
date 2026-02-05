@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#15803d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Input Kendaraan Masuk - Sistem Parkir FST UMKT">
+    
+    <title>Kendaraan Masuk - Parkir FST UMKT</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-green-700 to-green-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <a href="index.html" class="material-icons text-3xl hover:text-green-200 transition">arrow_back</a>
+                        <div>
+                            <h1 class="text-xl font-bold">Kendaraan Masuk</h1>
+                            <p class="text-sm text-green-100">Scan Barcode atau Input Manual</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-semibold" id="sessionInfo">-</p>
+                            <p class="text-xs text-green-100" id="currentTime"></p>
+                        </div>
+                        <span class="material-icons text-4xl">login</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container mx-auto px-4 py-6 max-w-6xl">
+            <!-- Capacity Alert Banner -->
+            <div id="capacityAlert" class="hidden mb-6 animate-fade-in"></div>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Scanner Section -->
+                <div class="bg-white rounded-lg shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.1s">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="material-icons text-green-600">qr_code_scanner</span>
+                        <h2 class="text-lg font-semibold text-gray-800">Scan Barcode/QR Code</h2>
+                    </div>
+                    
+                    <div id="reader" class="w-full rounded-lg overflow-hidden mb-4 scanner-container"></div>
+                    
+                    <button onclick="toggleScanner()" id="scanBtn" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition flex items-center justify-center space-x-2 shadow-md">
+                        <span class="material-icons">camera_alt</span>
+                        <span class="font-semibold">Aktifkan Scanner</span>
+                    </button>
+
+                    <div id="scanResult" class="mt-4 hidden animate-fade-in">
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="material-icons text-green-600">check_circle</span>
+                                <span class="font-semibold text-green-800">Berhasil Scan</span>
+                            </div>
+                            <p class="text-sm text-gray-700" id="scannedData"></p>
+                        </div>
+                    </div>
+
+                    <!-- Scanner Stats -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-green-600" id="todayScans">0</p>
+                                <p class="text-xs text-gray-500">Scan Hari Ini</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-blue-600" id="todayManual">0</p>
+                                <p class="text-xs text-gray-500">Input Manual</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Form Section -->
+                <div class="bg-white rounded-lg shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.2s">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="material-icons text-blue-600">edit</span>
+                        <h2 class="text-lg font-semibold text-gray-800">Input Manual</h2>
+                    </div>
+
+                    <form id="manualForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                <span class="material-icons text-sm">category</span>
+                                <span>Kategori</span>
+                            </label>
+                            <select id="categorySelect" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                                <option value="">Pilih Kategori</option>
+                                <option value="MAHASISWA">Mahasiswa (Gratis)</option>
+                                <option value="STAFF">Staff (Gratis)</option>
+                                <option value="KANTIN">Kantin (Gratis)</option>
+                                <option value="TAMU">Tamu</option>
+                            </select>
+                        </div>
+
+                        <div id="identifierField">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                <span class="material-icons text-sm">badge</span>
+                                <span id="identifierLabel">NIM/ID/Kode</span>
+                            </label>
+                            <input type="text" id="identifierInput" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Masukkan identitas">
+                            <p class="text-xs text-gray-500 mt-1" id="identifierHint">Format akan menyesuaikan kategori</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                <span class="material-icons text-sm">confirmation_number</span>
+                                <span>Plat Nomor</span>
+                            </label>
+                            <input type="text" id="plateInput" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent uppercase transition" placeholder="KT 1234 AB">
+                        </div>
+
+                        <!-- Tamu Fields -->
+                        <div id="tamuFields" class="hidden space-y-4 animate-fade-in">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                    <span class="material-icons text-sm">person</span>
+                                    <span>Status Tamu</span>
+                                </label>
+                                <select id="tamuStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
+                                    <option value="UNDANGAN">Undangan (Gratis)</option>
+                                    <option value="UMUM">Umum (Berbayar - Rp 2.000/jam)</option>
+                                </select>
+                            </div>
+                            <div id="buktiField" class="hidden animate-fade-in">
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-1">
+                                    <span class="material-icons text-sm">receipt</span>
+                                    <span>Bukti Transaksi/Undangan</span>
+                                </label>
+                                <input type="text" id="buktiInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="No. Bukti">
+                            </div>
+                        </div>
+
+                        <!-- Validation Messages -->
+                        <div id="validationMessage" class="hidden"></div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg transition flex items-center justify-center space-x-2 shadow-md font-semibold text-lg">
+                            <span class="material-icons">add_circle</span>
+                            <span>Tambah Kendaraan Masuk</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Format Guide -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mt-6 animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="material-icons text-gray-700">info</span>
+                    <h3 class="text-lg font-semibold text-gray-800">Panduan Format Barcode/QR</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="material-icons text-green-600">school</span>
+                            <span class="font-semibold">Mahasiswa</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1">Format: <code class="bg-gray-100 px-2 py-1 rounded">RFIDM + NIM</code></p>
+                        <p class="text-xs text-gray-500">Contoh: RFIDM2101010001</p>
+                        <p class="text-xs text-gray-500">atau NIM 13 digit langsung</p>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="material-icons text-purple-600">badge</span>
+                            <span class="font-semibold">Staff</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1">Format: <code class="bg-gray-100 px-2 py-1 rounded">RFIDS + ID</code></p>
+                        <p class="text-xs text-gray-500">Contoh: RFIDS00123</p>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="material-icons text-orange-600">restaurant</span>
+                            <span class="font-semibold">Kantin</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1">Format: <code class="bg-gray-100 px-2 py-1 rounded">KANTIN + Kode</code></p>
+                        <p class="text-xs text-gray-500">Contoh: KANTIN001</p>
+                    </div>
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="material-icons text-blue-600">person</span>
+                            <span class="font-semibold">Tamu</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1">Format: <code class="bg-gray-100 px-2 py-1 rounded">TAMU + Nomor</code></p>
+                        <p class="text-xs text-gray-500">Contoh: TAMU001</p>
+                        <p class="text-xs text-gray-500">(Generate otomatis)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Entries -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mt-6 animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-gray-700">history</span>
+                        <h3 class="text-lg font-semibold text-gray-800">Kendaraan Masuk Terakhir</h3>
+                    </div>
+                    <button onclick="refreshRecentEntries()" class="text-green-600 hover:text-green-700">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                </div>
+                <div id="recentEntries" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Recent entries will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sync.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/audit.js"></script>
+    <script src="js/printer.js"></script>
+    <script src="js/cameraScan.js"></script>
+    
+    <script>
+        let html5QrCode;
+        let isScanning = false;
+
+        // Initialize session
+        function initSession() {
+            const session = AuditSystem.getCurrentSession();
+            if (session.isAuthenticated) {
+                document.getElementById('sessionInfo').textContent = `${session.user} - ${session.gate}`;
+            } else {
+                document.getElementById('sessionInfo').textContent = 'Guest Mode';
+            }
+        }
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('id-ID');
+        }
+
+        // Check capacity and show alert
+        function checkCapacityAlert() {
+            const config = ParkingSystem.getConfig();
+            const stats = ParkingSystem.getStatistics();
+            const percent = Math.round((stats.total / config.maxCapacity) * 100);
+            const alertDiv = document.getElementById('capacityAlert');
+
+            if (percent >= 90) {
+                alertDiv.className = 'bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6 animate-fade-in';
+                alertDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons text-red-600 text-3xl">warning</span>
+                        <div class="flex-1">
+                            <h3 class="text-red-800 font-semibold">Parkiran Hampir Penuh!</h3>
+                            <p class="text-red-700 text-sm">Kapasitas: ${stats.total}/${config.maxCapacity} (${percent}%)</p>
+                        </div>
+                    </div>
+                `;
+                alertDiv.classList.remove('hidden');
+            } else if (percent >= 70) {
+                alertDiv.className = 'bg-orange-50 border-l-4 border-orange-500 p-4 rounded-lg mb-6 animate-fade-in';
+                alertDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons text-orange-600 text-3xl">info</span>
+                        <div class="flex-1">
+                            <h3 class="text-orange-800 font-semibold">Perhatian</h3>
+                            <p class="text-orange-700 text-sm">Kapasitas: ${stats.total}/${config.maxCapacity} (${percent}%)</p>
+                        </div>
+                    </div>
+                `;
+                alertDiv.classList.remove('hidden');
+            } else {
+                alertDiv.classList.add('hidden');
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const history = ParkingSystem.getTodayHistory();
+            document.getElementById('todayScans').textContent = history.in;
+            
+            const logs = AuditSystem.getTodayLogs();
+            const manualCount = logs.filter(l => l.action === 'VEHICLE_IN' && l.data.method === 'MANUAL').length;
+            document.getElementById('todayManual').textContent = manualCount;
+        }
+
+        // Category change handler
+        document.getElementById('categorySelect').addEventListener('change', function() {
+            const category = this.value;
+            const identifierLabel = document.getElementById('identifierLabel');
+            const identifierInput = document.getElementById('identifierInput');
+            const identifierHint = document.getElementById('identifierHint');
+            const tamuFields = document.getElementById('tamuFields');
+
+            tamuFields.classList.add('hidden');
+
+            switch(category) {
+                case 'MAHASISWA':
+                    identifierLabel.textContent = 'NIM (13 digit)';
+                    identifierInput.placeholder = 'Contoh: 2101010001234';
+                    identifierHint.textContent = 'Format: 13 digit angka atau RFIDM + NIM';
+                    break;
+                case 'STAFF':
+                    identifierLabel.textContent = 'ID Staff';
+                    identifierInput.placeholder = 'Contoh: 00123';
+                    identifierHint.textContent = 'Format: RFIDS + ID Staff';
+                    break;
+                case 'KANTIN':
+                    identifierLabel.textContent = 'Kode Vendor';
+                    identifierInput.placeholder = 'Contoh: KANTIN001';
+                    identifierHint.textContent = 'Format: KANTIN + kode vendor';
+                    break;
+                case 'TAMU':
+                    identifierLabel.textContent = 'Nama Tamu';
+                    identifierInput.placeholder = 'Masukkan nama tamu';
+                    identifierHint.textContent = 'Masukkan nama lengkap tamu';
+                    tamuFields.classList.remove('hidden');
+                    break;
+            }
+        });
+
+        // Tamu status change handler
+        document.getElementById('tamuStatus').addEventListener('change', function() {
+            const buktiField = document.getElementById('buktiField');
+            if (this.value === 'UNDANGAN') {
+                buktiField.classList.remove('hidden');
+            } else {
+                buktiField.classList.add('hidden');
+            }
+        });
+
+        // Scanner functions
+        function toggleScanner() {
+            if (!isScanning) {
+                startScanner();
+            } else {
+                stopScanner();
+            }
+        }
+
+        function startScanner() {
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                document.getElementById('scanBtn').innerHTML = '<span class="material-icons">stop</span><span class="font-semibold">Hentikan Scanner</span>';
+                document.getElementById('scanBtn').classList.remove('bg-green-600', 'hover:bg-green-700');
+                document.getElementById('scanBtn').classList.add('bg-red-600', 'hover:bg-red-700');
+            }).catch(err => {
+                showNotification('Gagal mengakses kamera: ' + err, 'error');
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    document.getElementById('scanBtn').innerHTML = '<span class="material-icons">camera_alt</span><span class="font-semibold">Aktifkan Scanner</span>';
+                    document.getElementById('scanBtn').classList.remove('bg-red-600', 'hover:bg-red-700');
+                    document.getElementById('scanBtn').classList.add('bg-green-600', 'hover:bg-green-700');
+                });
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            stopScanner();
+            document.getElementById('scanResult').classList.remove('hidden');
+            document.getElementById('scannedData').textContent = 'Data: ' + decodedText;
+
+            const result = ParkingSystem.parseBarcode(decodedText);
+            
+            if (result.category) {
+                document.getElementById('categorySelect').value = result.category;
+                document.getElementById('identifierInput').value = result.identifier;
+                document.getElementById('categorySelect').dispatchEvent(new Event('change'));
+                
+                setTimeout(() => {
+                    document.getElementById('plateInput').focus();
+                }, 500);
+            }
+        }
+
+        function onScanError(error) {
+            // Silent error handling
+        }
+
+        // Form submission
+        document.getElementById('manualForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const category = document.getElementById('categorySelect').value;
+            const identifier = document.getElementById('identifierInput').value.trim();
+            const plate = document.getElementById('plateInput').value.toUpperCase().trim();
+
+            if (!category || !identifier || !plate) {
+                showValidationError('Mohon lengkapi semua field');
+                return;
+            }
+
+            let additionalData = { method: 'MANUAL' };
+            if (category === 'TAMU') {
+                additionalData.tamuStatus = document.getElementById('tamuStatus').value;
+                if (additionalData.tamuStatus === 'UNDANGAN') {
+                    additionalData.bukti = document.getElementById('buktiInput').value;
+                }
+            }
+
+            const result = ParkingSystem.vehicleIn(category, identifier, plate, additionalData);
+
+            if (result.success) {
+                // Print ticket
+                TicketPrinter.printTicket(result.vehicle);
+                
+                showNotification('Kendaraan berhasil masuk!', 'success');
+                this.reset();
+                document.getElementById('scanResult').classList.add('hidden');
+                document.getElementById('tamuFields').classList.add('hidden');
+                document.getElementById('validationMessage').classList.add('hidden');
+                
+                checkCapacityAlert();
+                updateStats();
+                refreshRecentEntries();
+                
+                document.getElementById('categorySelect').focus();
+            } else {
+                showValidationError(result.message);
+            }
+        });
+
+        // Show validation error
+        function showValidationError(message) {
+            const validationDiv = document.getElementById('validationMessage');
+            validationDiv.className = 'bg-red-50 border border-red-200 rounded-lg p-4 animate-shake';
+            validationDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-red-600">error</span>
+                    <span class="text-red-800 font-semibold">${message}</span>
+                </div>
+            `;
+            validationDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                validationDiv.classList.remove('animate-shake');
+            }, 500);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `toast-notification ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-2`;
+            notification.innerHTML = `<span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span><span>${message}</span>`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('toast-exit');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Refresh recent entries
+        function refreshRecentEntries() {
+            const logs = AuditSystem.getLogsByAction('VEHICLE_IN').slice(-5).reverse();
+            const entriesDiv = document.getElementById('recentEntries');
+            
+            if (logs.length === 0) {
+                entriesDiv.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada kendaraan masuk</p>';
+                return;
+            }
+            
+            let html = '';
+            logs.forEach(log => {
+                const time = new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const data = log.data;
+                html += `
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-sm text-gray-800">${data.plate}</span>
+                            <span class="text-xs text-gray-500">${time}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">${data.category}</span>
+                            <span class="text-xs text-gray-600">${data.identifier}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            entriesDiv.innerHTML = html;
+        }
+
+        // Initialize
+        initSession();
+        updateTime();
+        setInterval(updateTime, 1000);
+        checkCapacityAlert();
+        updateStats();
+        refreshRecentEntries();
+
+        // Log page view
+        AuditSystem.log('PAGE_VIEW', { page: 'vehicle_entry' });
+    </script>
+</body>
+</html>
